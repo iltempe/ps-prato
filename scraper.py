@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import csv
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -42,6 +43,12 @@ TZ = ZoneInfo("Europe/Rome")
 FIELDS = ["ts_scrape", "regione", "provincia", "ospedale",
           "codice", "in_attesa", "in_trattamento"]
 CODICI = ["rosso", "giallo", "verde", "azzurro", "bianco", "totali"]
+
+# L'API ha una cache: su cache-miss risponde con data[0].data == [] e manda i
+# dati via websocket. E' transitorio, quindi riproviamo qualche volta nello
+# stesso run prima di arrenderci (un run ogni 15 min non deve sprecare il giro).
+RETRIES = 5
+RETRY_WAIT = 8  # secondi tra un tentativo e l'altro
 
 
 def fetch(regione: str, provincia: str) -> dict:
@@ -88,17 +95,33 @@ def append(rows: list[dict]) -> None:
         w.writerows(rows)
 
 
+def raccogli(regione: str, provincia: str, ts: str) -> list[dict]:
+    """Prova a estrarre le righe per un target, con retry sul cache-miss."""
+    ultimo_err: Exception | None = None
+    for tentativo in range(1, RETRIES + 1):
+        try:
+            return rows_from(fetch(regione, provincia), regione, provincia, ts)
+        except Exception as e:  # cache-miss o errore transitorio
+            ultimo_err = e
+            if tentativo < RETRIES:
+                print(f"[{ts}] {regione}/{provincia}: tentativo {tentativo} vuoto/errore "
+                      f"({e}), riprovo tra {RETRY_WAIT}s")
+                time.sleep(RETRY_WAIT)
+    print(f"[{ts}] {regione}/{provincia}: nessun dato dopo {RETRIES} tentativi "
+          f"({ultimo_err}) - giro saltato", file=sys.stderr)
+    return []
+
+
 def main() -> int:
     ts = datetime.now(TZ).isoformat(timespec="seconds")
     all_rows: list[dict] = []
     for regione, provincia in TARGETS:
-        try:
-            all_rows += rows_from(fetch(regione, provincia), regione, provincia, ts)
-        except Exception as e:  # una provincia non deve far fallire le altre
-            print(f"[{ts}] ERRORE {regione}/{provincia}: {e}", file=sys.stderr)
+        all_rows += raccogli(regione, provincia, ts)
     if not all_rows:
-        print(f"[{ts}] nessun dato raccolto")
-        return 1
+        # Cache-miss su tutti i target: giro saltato, NON e' un errore.
+        # Uscita 0 cosi' il workflow resta verde e semplicemente non committa.
+        print(f"[{ts}] nessun dato raccolto in questo giro (previsto: cache-miss)")
+        return 0
     append(all_rows)
     osp = len({r["ospedale"] for r in all_rows})
     print(f"[{ts}] +{len(all_rows)} righe da {osp} ospedali")
