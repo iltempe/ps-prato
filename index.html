@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS Prato — occupazione in tempo reale</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --ink:#1a1c1f; --muted:#6b7280; --line:#e5e7eb;
+    --rosso:#e23b3b; --giallo:#e6b800; --verde:#2fa84f; --azzurro:#3b93e2; --bianco:#9aa3ad;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0f1115; --card:#181b20; --ink:#e9eaec; --muted:#9aa3ad; --line:#282c33; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:20px;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+  .sub a{color:inherit}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .big{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:18px}
+  .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .v{font-size:30px;font-weight:700;margin-top:4px}
+  .v small{font-size:14px;font-weight:500;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
+  .rosso{background:var(--rosso)} .giallo{background:var(--giallo)} .verde{background:var(--verde)}
+  .azzurro{background:var(--azzurro)} .bianco{background:var(--bianco);border:1px solid var(--line)}
+  canvas{width:100%!important;height:300px!important}
+  .foot{color:var(--muted);font-size:12px;margin-top:26px;line-height:1.6}
+  .err{background:#fde8e8;color:#9b1c1c;border:1px solid #f5c6c6;border-radius:10px;padding:12px 14px}
+  @media (prefers-color-scheme: dark){.err{background:#3a1d1d;color:#f3c6c6;border-color:#5a2a2a}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Pronto Soccorso di Prato — occupazione</h1>
+  <p class="sub">Nuovo Ospedale S. Stefano · dati campionati ogni ~15 min ·
+     fonte: <strong>Azienda USL Toscana Centro</strong> (via prontosoccorso.live)</p>
+
+  <div id="stato"></div>
+
+  <div class="grid" id="kpi"></div>
+
+  <div class="big">
+    <div class="k">Presenze per codice colore — ultimo rilevamento</div>
+    <table id="tab">
+      <thead><tr><th>Codice</th><th>In attesa</th><th>In trattamento</th><th>Totale</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="big">
+    <div class="k" style="margin-bottom:10px">Andamento nel tempo — totale pazienti</div>
+    <canvas id="chart"></canvas>
+  </div>
+
+  <p class="foot">
+    <span id="aggiornato"></span><br>
+    "In attesa" = pazienti in sala d'attesa; "in trattamento" = presi in carico ma ancora in PS.
+    Un rilevamento vuoto (cache dell'API) viene saltato, quindi l'intervallo tra due punti può superare i 15 min.
+    Pagina statica: si aggiorna a ogni commit del dataset.
+  </p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const CSV_URL = "data/presenze.csv";
+const CODICI = ["rosso","giallo","verde","azzurro","bianco"];
+const COL = {rosso:"#e23b3b",giallo:"#e6b800",verde:"#2fa84f",azzurro:"#3b93e2",bianco:"#9aa3ad"};
+
+function parseCSV(text){
+  const lines = text.trim().split(/\r?\n/);
+  const head = lines[0].split(",");
+  return lines.slice(1).map(l=>{
+    const c = l.split(",");
+    const o = {};
+    head.forEach((h,i)=>o[h.trim()] = c[i]);
+    return o;
+  });
+}
+
+function fmtTs(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleString("it-IT",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+  }catch(e){ return iso; }
+}
+
+fetch(CSV_URL, {cache:"no-store"})
+  .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.text(); })
+  .then(text=>{
+    const rows = parseCSV(text);
+    if(!rows.length) throw new Error("dataset vuoto");
+
+    // raggruppa per timestamp
+    const byTs = new Map();
+    for(const r of rows){
+      if(!byTs.has(r.ts_scrape)) byTs.set(r.ts_scrape, {});
+      byTs.get(r.ts_scrape)[r.codice] = {
+        att:+r.in_attesa||0, trt:+r.in_trattamento||0
+      };
+    }
+    const stamps = [...byTs.keys()].sort();
+    const lastTs = stamps[stamps.length-1];
+    const last = byTs.get(lastTs);
+
+    // KPI
+    const tot = last.totali || {att:0,trt:0};
+    const inPS = (tot.att||0)+(tot.trt||0);
+    document.getElementById("kpi").innerHTML = `
+      <div class="card"><div class="k">In Pronto Soccorso</div><div class="v">${inPS}</div></div>
+      <div class="card"><div class="k">In attesa</div><div class="v">${tot.att}</div></div>
+      <div class="card"><div class="k">In trattamento</div><div class="v">${tot.trt}</div></div>
+      <div class="card"><div class="k">Rilevamenti</div><div class="v">${stamps.length}<small> punti</small></div></div>`;
+
+    // tabella per codice
+    const tb = document.querySelector("#tab tbody");
+    tb.innerHTML = CODICI.map(c=>{
+      const v = last[c]||{att:0,trt:0};
+      return `<tr><td><span class="dot ${c}"></span>${c}</td>
+        <td>${v.att}</td><td>${v.trt}</td><td><strong>${(v.att||0)+(v.trt||0)}</strong></td></tr>`;
+    }).join("");
+
+    document.getElementById("aggiornato").textContent = "Ultimo rilevamento: " + fmtTs(lastTs);
+
+    // grafico: totale att+trt e solo attesa
+    const labels = stamps.map(fmtTs);
+    const serieTot = stamps.map(t=>{const x=byTs.get(t).totali||{};return (x.att||0)+(x.trt||0);});
+    const serieAtt = stamps.map(t=>{const x=byTs.get(t).totali||{};return (x.att||0);});
+    new Chart(document.getElementById("chart"), {
+      type:"line",
+      data:{labels, datasets:[
+        {label:"Totale in PS", data:serieTot, borderColor:"#3b93e2", backgroundColor:"rgba(59,147,226,.12)", fill:true, tension:.25, pointRadius:0, borderWidth:2},
+        {label:"In attesa", data:serieAtt, borderColor:"#e23b3b", backgroundColor:"transparent", tension:.25, pointRadius:0, borderWidth:2}
+      ]},
+      options:{responsive:true, maintainAspectRatio:false,
+        interaction:{mode:"index",intersect:false},
+        scales:{y:{beginAtZero:true,ticks:{precision:0}}, x:{ticks:{maxTicksLimit:8,autoSkip:true}}},
+        plugins:{legend:{labels:{boxWidth:12}}}}
+    });
+  })
+  .catch(e=>{
+    document.getElementById("stato").innerHTML =
+      `<div class="err">Impossibile caricare i dati (<code>${CSV_URL}</code>): ${e.message}.
+       Se stai aprendo il file in locale col doppio click, il browser blocca la lettura del CSV:
+       apri la pagina tramite GitHub Pages oppure avvia un piccolo server locale
+       (<code>python3 -m http.server</code>).</div>`;
+  });
+</script>
+</body>
+</html>
