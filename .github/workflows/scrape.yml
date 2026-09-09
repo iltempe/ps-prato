@@ -1,0 +1,50 @@
+name: scrape-ps
+
+# Il repo raccoglie i dati da solo: ogni 15 minuti GitHub esegue lo scraper
+# e committa il CSV solo se e' cambiato. Nessun server da tenere acceso.
+#
+# NOTE:
+# - il cron di GitHub e' "best effort": in fasce di alto carico i run possono
+#   ritardare di parecchi minuti o saltare. Per una raccolta statistica va bene.
+# - GitHub disattiva i workflow schedulati dopo 60 giorni SENZA commit nel repo.
+#   Finche' lo scraper committa dati non e' un problema; se la pagina resta
+#   ferma a lungo, fai un commit qualsiasi per tenerlo vivo.
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}   # permette anche l'avvio manuale dalla tab Actions
+
+permissions:
+  contents: write         # serve per fare push del CSV aggiornato
+
+concurrency:
+  group: scrape-ps
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Esegui scraper
+        run: python scraper.py
+
+      - name: Commit dati se cambiati
+        run: |
+          git config user.name  "ps-scraper-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "Nessun dato nuovo, niente commit."
+          else
+            git commit -m "dati: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi

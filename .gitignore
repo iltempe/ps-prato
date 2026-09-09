@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+
+# grafici generati da analizza.py
+analisi/
+
+# archivio di distribuzione, non va nel repo
+*.zip
