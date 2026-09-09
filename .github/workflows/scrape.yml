@@ -12,7 +12,10 @@ name: scrape-ps
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    # ~ogni 15 min ma su minuti SFASATI dall'ora: gli slot :00/:15/:30/:45 sono
+    # i piu' congestionati e GitHub li ritarda o li salta piu' spesso. Restare
+    # lontani dal top dell'ora riduce ritardi e buchi (resta comunque best-effort).
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch: {}   # permette anche l'avvio manuale dalla tab Actions
 
 permissions:
