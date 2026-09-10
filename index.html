@@ -3,7 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PS Prato — occupazione in tempo reale</title>
+<title>PS Prato Live — occupazione del Pronto Soccorso di Prato</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="alternate icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="description" content="Occupazione del Pronto Soccorso di Prato (Nuovo Ospedale S. Stefano) in tempo reale e serie storica degli accessi. Progetto civico di @iltempe.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PS Prato Live">
+<meta property="og:title" content="PS Prato Live — Pronto Soccorso di Prato">
+<meta property="og:description" content="Occupazione del PS in tempo reale + serie storica degli accessi. Fonti: USL Toscana Centro, ARS Toscana.">
+<meta property="og:url" content="https://iltempe.github.io/ps-prato/">
+<meta property="og:image" content="https://iltempe.github.io/ps-prato/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PS Prato Live — Pronto Soccorso di Prato">
+<meta name="twitter:description" content="Occupazione del PS in tempo reale + serie storica degli accessi.">
+<meta name="twitter:image" content="https://iltempe.github.io/ps-prato/og-image.png">
 <style>
   :root{
     --bg:#f6f7f9; --card:#fff; --ink:#1a1c1f; --muted:#6b7280; --line:#e5e7eb;
@@ -17,6 +33,11 @@
     font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
   .wrap{max-width:920px;margin:0 auto;padding:22px 16px 60px}
   h1{font-size:20px;margin:0 0 2px}
+  .brand{display:flex;align-items:center;gap:13px;margin:0 0 4px}
+  .brandmark{width:44px;height:44px;flex:0 0 auto;border-radius:11px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+  .brandname{font-size:23px;font-weight:700;letter-spacing:-.01em;margin:0;line-height:1.05}
+  .brandname .live{color:var(--rosso)}
+  .brandtag{color:var(--muted);font-size:13px;margin-top:2px}
   .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
   .sub a{color:inherit}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
@@ -48,8 +69,18 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Pronto Soccorso di Prato — occupazione</h1>
-  <p class="sub">Nuovo Ospedale S. Stefano · dati campionati ogni ~15 min ·
+  <div class="brand">
+    <svg class="brandmark" viewBox="0 0 64 64" role="img" aria-label="PS Prato Live">
+      <rect x="2" y="2" width="60" height="60" rx="14" fill="#e23b3b"/>
+      <rect x="26.5" y="12" width="11" height="40" rx="3.5" fill="#ffffff"/>
+      <rect x="12" y="26.5" width="40" height="11" rx="3.5" fill="#ffffff"/>
+    </svg>
+    <div>
+      <h1 class="brandname">PS Prato <span class="live">Live</span></h1>
+      <div class="brandtag">Pronto Soccorso · Nuovo Ospedale S. Stefano</div>
+    </div>
+  </div>
+  <p class="sub">Dati campionati ogni ~15 min ·
      fonte: <strong>Azienda USL Toscana Centro</strong> (via prontosoccorso.live)</p>
 
   <div id="stato"></div>

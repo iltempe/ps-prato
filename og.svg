@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <rect width="1200" height="14" fill="#e23b3b"/>
+
+  <!-- logo mark -->
+  <rect x="80" y="150" width="170" height="170" rx="36" fill="#e23b3b"/>
+  <rect x="150" y="178" width="30" height="114" rx="8" fill="#ffffff"/>
+  <rect x="108" y="220" width="114" height="30" rx="8" fill="#ffffff"/>
+
+  <!-- wordmark + tagline -->
+  <text x="292" y="228" font-family="Helvetica, Arial, sans-serif" font-size="90" font-weight="700" fill="#1a1c1f">PS Prato Live</text>
+  <text x="296" y="292" font-family="Helvetica, Arial, sans-serif" font-size="42" font-weight="700" fill="#e23b3b">Pronto Soccorso &#183; Santo Stefano</text>
+  <text x="296" y="342" font-family="Helvetica, Arial, sans-serif" font-size="30" fill="#6b7280">Occupazione in tempo reale &#183; serie storica degli accessi</text>
+
+  <!-- triage color dots -->
+  <circle cx="92"  cy="556" r="13" fill="#e23b3b"/>
+  <circle cx="132" cy="556" r="13" fill="#e6b800"/>
+  <circle cx="172" cy="556" r="13" fill="#2fa84f"/>
+  <circle cx="212" cy="556" r="13" fill="#3b93e2"/>
+  <circle cx="252" cy="556" r="13" fill="#ffffff" stroke="#c9ced6" stroke-width="2"/>
+
+  <text x="284" y="565" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="700" fill="#1a1c1f">iltempe.github.io/ps-prato</text>
+  <text x="1120" y="565" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#6b7280">Fonti: USL Toscana Centro &#183; ARS Toscana</text>
+</svg>
