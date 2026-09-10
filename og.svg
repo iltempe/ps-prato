@@ -8,9 +8,9 @@
   <rect x="108" y="220" width="114" height="30" rx="8" fill="#ffffff"/>
 
   <!-- wordmark + tagline -->
-  <text x="292" y="228" font-family="Helvetica, Arial, sans-serif" font-size="90" font-weight="700" fill="#1a1c1f">PS Prato Live</text>
-  <text x="296" y="292" font-family="Helvetica, Arial, sans-serif" font-size="42" font-weight="700" fill="#e23b3b">Pronto Soccorso &#183; Santo Stefano</text>
-  <text x="296" y="342" font-family="Helvetica, Arial, sans-serif" font-size="30" fill="#6b7280">Occupazione in tempo reale &#183; serie storica degli accessi</text>
+  <text x="292" y="222" font-family="Helvetica, Arial, sans-serif" font-size="88" font-weight="700" fill="#1a1c1f">PS Prato Live</text>
+  <text x="296" y="286" font-family="Helvetica, Arial, sans-serif" font-size="40" font-weight="700" fill="#e23b3b">I numeri dell&#8217;attesa, in tempo reale.</text>
+  <text x="296" y="338" font-family="Helvetica, Arial, sans-serif" font-size="30" fill="#6b7280">Pronto Soccorso &#183; Nuovo Ospedale S. Stefano &#183; Prato</text>
 
   <!-- triage color dots -->
   <circle cx="92"  cy="556" r="13" fill="#e23b3b"/>
