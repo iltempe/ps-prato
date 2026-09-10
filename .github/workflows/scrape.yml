@@ -76,8 +76,12 @@ jobs:
                 git diff --staged --quiet || { git commit -q -m "dati: $(date -u +%FT%TZ)"; git push -q || true; }
               fi
             fi
-            [ "$(date +%s)" -ge "$FINE" ] && break
-            sleep "${INTERVALLO_SEC}"
+            ORA=$(date +%s)
+            [ "$ORA" -ge "$FINE" ] && break
+            # dormi fino al prossimo campione, ma non oltre la fine del run
+            RESTA=$(( FINE - ORA ))
+            [ "$RESTA" -gt "$INTERVALLO_SEC" ] && RESTA="$INTERVALLO_SEC"
+            sleep "$RESTA"
           done
 
       - name: Riavvia la catena
@@ -89,7 +93,7 @@ jobs:
             code=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
               -H "Authorization: Bearer ${PS_PAT}" \
               -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/scrape-ps.yml/dispatches" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/scrape.yml/dispatches" \
               -d '{"ref":"main"}')
             echo "self-restart via PS_PAT -> HTTP $code (204 = ok)"
           else
