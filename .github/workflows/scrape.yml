@@ -1,33 +1,43 @@
 name: scrape-ps
 
-# Il repo raccoglie i dati da solo: ogni 15 minuti GitHub esegue lo scraper
-# e committa il CSV solo se e' cambiato. Nessun server da tenere acceso.
+# Deploy 100% remoto: la raccolta gira su GitHub, non serve tenere acceso nulla.
 #
-# NOTE:
-# - il cron di GitHub e' "best effort": in fasce di alto carico i run possono
-#   ritardare di parecchi minuti o saltare. Per una raccolta statistica va bene.
-# - GitHub disattiva i workflow schedulati dopo 60 giorni SENZA commit nel repo.
-#   Finche' lo scraper committa dati non e' un problema; se la pagina resta
-#   ferma a lungo, fai un commit qualsiasi per tenerlo vivo.
+# PERCHE' NON UN SEMPLICE CRON */15:
+#   Il cron di GitHub Actions e' "best-effort" e sui repo piccoli viene
+#   pesantemente strozzato: puo' passare da 1 esecuzione ogni poche ore invece
+#   che ogni 15 min. Per avere davvero un campione ogni 15 min usiamo un unico
+#   run a lunga durata (fino a ~5,5h, il massimo di un job) che campiona in
+#   loop e committa a ogni giro. Finche' quel run e' vivo, la cadenza e' esatta.
+#
+# RIAVVIO DELLA CATENA (a fine run, ~5,5h):
+#   - se e' impostato il secret PS_PAT (Personal Access Token con Actions:write),
+#     il run ri-lancia se stesso -> copertura 24/7 senza buchi, tutto su GitHub.
+#   - altrimenti il riavvio dipende dallo schedule cron qui sotto (best-effort):
+#     funziona comunque, ma tra un run e il successivo puo' esserci un buco.
 
 on:
   schedule:
-    # ~ogni 15 min ma su minuti SFASATI dall'ora: gli slot :00/:15/:30/:45 sono
-    # i piu' congestionati e GitHub li ritarda o li salta piu' spesso. Restare
-    # lontani dal top dell'ora riduce ritardi e buchi (resta comunque best-effort).
-    - cron: "7,22,37,52 * * * *"
-  workflow_dispatch: {}   # permette anche l'avvio manuale dalla tab Actions
+    # Kicker: se nessun run e' vivo, prova a farne ripartire uno. Minuti sfasati
+    # dagli slot congestionati (:00/:15/:30/:45).
+    - cron: "8,38 * * * *"
+  workflow_dispatch: {}
 
 permissions:
-  contents: write         # serve per fare push del CSV aggiornato
+  contents: write
 
 concurrency:
+  # Un solo run alla volta: il long-run tiene il gruppo, i tentativi dello
+  # schedule mentre e' vivo vengono scartati (niente doppioni).
   group: scrape-ps
   cancel-in-progress: false
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 355          # limite hard di GitHub e' 360; stiamo sotto
+    env:
+      DURATA_MIN: "330"           # durata del loop (~5,5h)
+      INTERVALLO_SEC: "900"       # 15 minuti tra un campione e l'altro
     steps:
       - uses: actions/checkout@v4
 
@@ -37,17 +47,44 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - name: Esegui scraper
-        run: python scraper.py
-
-      - name: Commit dati se cambiati
+      - name: Loop di campionamento
         run: |
+          set -u
           git config user.name  "ps-scraper-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/
-          if git diff --staged --quiet; then
-            echo "Nessun dato nuovo, niente commit."
+          FINE=$(( $(date +%s) + DURATA_MIN*60 ))
+          while : ; do
+            python scraper.py || true
+            git add data/
+            if ! git diff --staged --quiet ; then
+              git commit -q -m "dati: $(date -u +%FT%TZ)"
+              if ! git push -q ; then
+                # push concorrente (es. commit manuale): riparti dal remoto e
+                # ricampiona, cosi' non si creano conflitti sulla coda del CSV.
+                git fetch -q origin main
+                git reset -q --hard origin/main
+                python scraper.py || true
+                git add data/
+                git diff --staged --quiet || { git commit -q -m "dati: $(date -u +%FT%TZ)"; git push -q || true; }
+              fi
+            fi
+            [ "$(date +%s)" -ge "$FINE" ] && break
+            sleep "${INTERVALLO_SEC}"
+          done
+
+      - name: Riavvia la catena
+        if: always()
+        env:
+          PS_PAT: ${{ secrets.PS_PAT }}
+        run: |
+          if [ -n "${PS_PAT:-}" ] ; then
+            code=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+              -H "Authorization: Bearer ${PS_PAT}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/scrape-ps.yml/dispatches" \
+              -d '{"ref":"main"}')
+            echo "self-restart via PS_PAT -> HTTP $code (204 = ok)"
           else
-            git commit -m "dati: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git push
+            echo "PS_PAT non impostato: il riavvio dipende dallo schedule cron (best-effort)."
+            echo "Per copertura 24/7 senza buchi imposta il secret PS_PAT (vedi README)."
           fi

@@ -8,7 +8,3 @@ analisi/
 
 # archivio di distribuzione, non va nel repo
 *.zip
-
-# runner locale (launchd), machine-specific
-.local-runner.sh
-.local-runner.log
