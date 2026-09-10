@@ -33,6 +33,11 @@
   .rosso{background:var(--rosso)} .giallo{background:var(--giallo)} .verde{background:var(--verde)}
   .azzurro{background:var(--azzurro)} .bianco{background:var(--bianco);border:1px solid var(--line)}
   canvas{width:100%!important;height:300px!important}
+  .fonte{color:var(--muted);font-size:11px;margin-top:10px;font-style:italic}
+  .seg{display:inline-flex;margin:8px 0 4px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;padding:6px 12px;cursor:pointer}
+  .seg button+button{border-left:1px solid var(--line)}
+  .seg button.on{background:var(--azzurro);color:#fff}
   .foot{color:var(--muted);font-size:12px;margin-top:26px;line-height:1.6}
   .credits{color:var(--muted);font-size:13px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
   .credits a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
@@ -62,6 +67,18 @@
   <div class="big">
     <div class="k" style="margin-bottom:10px">Andamento nel tempo — totale pazienti</div>
     <canvas id="chart"></canvas>
+    <div class="fonte">Fonte: USL Toscana Centro (via prontosoccorso.live) — presenze in tempo reale</div>
+  </div>
+
+  <div class="big">
+    <div class="k" style="margin-bottom:2px">Il carico nel tempo — accessi annui</div>
+    <div class="seg" role="group" aria-label="Unità di misura">
+      <button id="segAbs" class="on" type="button">Valori assoluti</button>
+      <button id="segRate" type="button">Tasso per 1.000 ab.</button>
+    </div>
+    <div id="statoStorico"></div>
+    <canvas id="chartStorico"></canvas>
+    <div class="fonte">Fonte: ARS Toscana, indicatore 1657 — accessi in Pronto Soccorso per residenza</div>
   </div>
 
   <p class="foot">
@@ -162,6 +179,87 @@ fetch(CSV_URL, {cache:"no-store"})
        apri la pagina tramite GitHub Pages oppure avvia un piccolo server locale
        (<code>python3 -m http.server</code>).</div>`;
   });
+
+// --- Pannello storico ARS: accessi annui per residenza (2010-2025) ---------
+(function(){
+  const ARS_URL = "data/accessi_ars_2010-2025.csv";
+  const num = s => parseInt(String(s).replace(/[^0-9-]/g,""),10);
+  const dec = s => parseFloat(String(s).replace(",", "."));   // tassi con virgola: "33,2" -> 33.2
+
+  // split che rispetta i campi tra virgolette (i tassi sono quotati con virgola interna)
+  function splitCSVLine(line){
+    const out=[]; let cur="", q=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(q){ if(ch==='"'){ if(line[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=ch; }
+      else { if(ch==='"') q=true; else if(ch===","){ out.push(cur); cur=""; } else cur+=ch; }
+    }
+    out.push(cur); return out;
+  }
+
+  fetch(ARS_URL, {cache:"no-store"})
+    .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.text(); })
+    .then(text=>{
+      const lines = text.trim().split(/\r?\n/);
+      const head = splitCSVLine(lines[0]).map(h=>h.trim());
+      const idx = Object.fromEntries(head.map((h,i)=>[h,i]));
+      const rows = lines.slice(1).map(splitCSVLine).filter(c=>c.length>=6);
+
+      const anni    = rows.map(c=> num(c[idx.anno]));
+      const accCom  = rows.map(c=> num(c[idx.accessi_residenti_comune_prato]));
+      const accZona = rows.map(c=> num(c[idx.accessi_residenti_zona_pratese]));
+      const tasCom  = rows.map(c=> dec(c[idx.tasso_x1000_comune]));
+      const tasZona = rows.map(c=> dec(c[idx.tasso_x1000_zona]));
+
+      const C_COM = "#3b93e2", C_ZONA = "#2fa84f";
+      const ds = (label,data,color)=>({
+        label, data, borderColor:color, backgroundColor:"transparent",
+        tension:.25, pointRadius:2, borderWidth:2
+      });
+
+      let modo = "assoluti"; // "assoluti" | "tasso"
+
+      const chart = new Chart(document.getElementById("chartStorico"), {
+        type:"line",
+        data:{ labels:anni, datasets:[ ds("Comune di Prato",accCom,C_COM), ds("Zona Pratese",accZona,C_ZONA) ] },
+        options:{ responsive:true, maintainAspectRatio:false,
+          interaction:{mode:"index",intersect:false},
+          scales:{ y:{ beginAtZero:false, ticks:{precision:0} } },
+          plugins:{ legend:{labels:{boxWidth:12}},
+            tooltip:{callbacks:{ label:ctx=> ctx.dataset.label+": "+ctx.formattedValue+(modo==="tasso"?" ‰":"") }} }
+        }
+      });
+
+      function render(){
+        if(modo==="assoluti"){
+          chart.data.datasets[0].data = accCom;
+          chart.data.datasets[1].data = accZona;
+          chart.options.scales.y.title = {display:true, text:"Accessi/anno"};
+        } else {
+          chart.data.datasets[0].data = tasCom;
+          chart.data.datasets[1].data = tasZona;
+          chart.options.scales.y.title = {display:true, text:"Tasso per 1.000 ab."};
+        }
+        chart.update();
+      }
+
+      const btnAbs  = document.getElementById("segAbs");
+      const btnRate = document.getElementById("segRate");
+      function setModo(m){
+        modo = m;
+        btnAbs.classList.toggle("on", m==="assoluti");
+        btnRate.classList.toggle("on", m==="tasso");
+        render();
+      }
+      btnAbs.addEventListener("click", ()=>setModo("assoluti"));
+      btnRate.addEventListener("click", ()=>setModo("tasso"));
+      render(); // stato iniziale: valori assoluti
+    })
+    .catch(e=>{
+      document.getElementById("statoStorico").innerHTML =
+        `<div class="err">Impossibile caricare la serie storica (<code>${ARS_URL}</code>): ${e.message}.</div>`;
+    });
+})();
 </script>
 </body>
 </html>
