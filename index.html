@@ -34,6 +34,9 @@
   .azzurro{background:var(--azzurro)} .bianco{background:var(--bianco);border:1px solid var(--line)}
   canvas{width:100%!important;height:300px!important}
   .foot{color:var(--muted);font-size:12px;margin-top:26px;line-height:1.6}
+  .credits{color:var(--muted);font-size:13px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+  .credits a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+  .credits a:hover{color:var(--ink)}
   .err{background:#fde8e8;color:#9b1c1c;border:1px solid #f5c6c6;border-radius:10px;padding:12px 14px}
   @media (prefers-color-scheme: dark){.err{background:#3a1d1d;color:#f3c6c6;border-color:#5a2a2a}}
 </style>
@@ -66,6 +69,12 @@
     "In attesa" = pazienti in sala d'attesa; "in trattamento" = presi in carico ma ancora in PS.
     Un rilevamento vuoto (cache dell'API) viene saltato, quindi l'intervallo tra due punti può superare i 15 min.
     Pagina statica: si aggiorna a ogni commit del dataset.
+  </p>
+
+  <p class="credits">
+    A cura di <a href="https://github.com/iltempe" target="_blank" rel="noopener">Matteo Tempestini · @iltempe</a>
+    · <a href="https://github.com/iltempe/ps-prato" target="_blank" rel="noopener">Repository</a>
+    · <a href="https://github.com/iltempe/ps-prato/blob/main/data/presenze.csv" target="_blank" rel="noopener">Dataset (CSV)</a>
   </p>
 </div>
 
