@@ -55,6 +55,14 @@
   .azzurro{background:var(--azzurro)} .bianco{background:var(--bianco);border:1px solid var(--line)}
   canvas{width:100%!important;height:300px!important}
   .fonte{color:var(--muted);font-size:11px;margin-top:10px;font-style:italic}
+  .gloss summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+  .gloss summary::-webkit-details-marker{display:none}
+  .gloss summary::before{content:"▸";color:var(--muted);font-size:11px;transition:transform .15s ease}
+  .gloss[open] summary::before{transform:rotate(90deg)}
+  .gloss-body{margin-top:14px;display:flex;flex-direction:column;gap:11px}
+  .gloss-item{font-size:14px;line-height:1.55;color:var(--ink)}
+  .gloss-item .gt{font-weight:700}
+  .gloss .fonte{margin-top:2px}
   .seg{display:inline-flex;margin:8px 0 4px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
   .seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;padding:6px 12px;cursor:pointer}
   .seg button+button{border-left:1px solid var(--line)}
@@ -101,6 +109,16 @@
     <div class="fonte">Fonte: USL Toscana Centro (via prontosoccorso.live) — presenze in tempo reale</div>
   </div>
 
+  <details class="big gloss">
+    <summary class="k">Come leggere i numeri</summary>
+    <div class="gloss-body">
+      <div class="gloss-item"><span class="gt">In attesa</span> — pazienti già registrati al triage e con un codice colore assegnato, ma non ancora chiamati dal medico. È l'attesa in senso stretto, quella della sala d'aspetto.</div>
+      <div class="gloss-item"><span class="gt">In trattamento</span> — pazienti già presi in carico, dentro il percorso clinico. Non vuol dire "curati in questo istante": comprende la visita ma anche l'attesa di prelievi, referti, ecografie e del posto letto in reparto. Gran parte del tempo di permanenza sta qui.</div>
+      <div class="gloss-item"><span class="gt">Presenti</span> — la somma delle due voci: l'occupazione totale del PS in quel momento.</div>
+      <div class="fonte">È una fotografia istantanea: dice quante persone ci sono, non da quanto tempo. I tempi di permanenza non sono in questo dato.</div>
+    </div>
+  </details>
+
   <div class="big">
     <div class="k" style="margin-bottom:2px">Il carico nel tempo — accessi annui</div>
     <div class="seg" role="group" aria-label="Unità di misura">
@@ -123,6 +141,7 @@
     A cura di <a href="https://github.com/iltempe" target="_blank" rel="noopener">Matteo Tempestini · @iltempe</a>
     · <a href="https://github.com/iltempe/ps-prato" target="_blank" rel="noopener">Repository</a>
     · <a href="https://github.com/iltempe/ps-prato/blob/main/data/presenze.csv" target="_blank" rel="noopener">Dataset (CSV)</a>
+    · <a href="https://buymeacoffee.com/iltempe" target="_blank" rel="noopener">☕ Offrimi un caffè</a>
   </p>
 </div>
 
