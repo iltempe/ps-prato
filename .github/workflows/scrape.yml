@@ -20,7 +20,12 @@ on:
     # Kicker: se nessun run e' vivo, prova a farne ripartire uno. Minuti sfasati
     # dagli slot congestionati (:00/:15/:30/:45).
     - cron: "8,38 * * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      durata_min:
+        description: "Durata del loop in minuti (solo per test: es. 1 per un run lampo)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -52,6 +57,9 @@ jobs:
           set -u
           git config user.name  "ps-scraper-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          DUR="${{ github.event.inputs.durata_min }}"
+          [ -n "$DUR" ] && DURATA_MIN="$DUR"
+          echo "Durata loop: ${DURATA_MIN} min, intervallo: ${INTERVALLO_SEC}s"
           FINE=$(( $(date +%s) + DURATA_MIN*60 ))
           while : ; do
             python scraper.py || true
