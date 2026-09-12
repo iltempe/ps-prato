@@ -45,6 +45,17 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      # Iscritti (chat id) persistiti nella cache privata del repo, NON nel
+      # repo pubblico. restore prende l'ultima cache "tgsubs-*".
+      - name: Ripristina iscritti
+        if: ${{ env.TG_BOT_TOKEN != '' }}
+        uses: actions/cache/restore@v4
+        with:
+          path: state
+          key: tgsubs-${{ github.run_id }}
+          restore-keys: |
+            tgsubs-
+
       - name: Bot (long-poll)
         if: ${{ env.TG_BOT_TOKEN != '' }}
         env:
@@ -53,6 +64,13 @@ jobs:
           [ -n "$DUR" ] && export DURATA_MIN="$DUR"
           echo "Avvio bot (durata ${DURATA_MIN} min)"
           python telegram_bot.py
+
+      - name: Salva iscritti
+        if: ${{ always() && env.TG_BOT_TOKEN != '' }}
+        uses: actions/cache/save@v4
+        with:
+          path: state
+          key: tgsubs-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Avviso token mancante
         if: ${{ env.TG_BOT_TOKEN == '' }}

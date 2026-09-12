@@ -8,3 +8,6 @@ analisi/
 
 # archivio di distribuzione, non va nel repo
 *.zip
+
+# stato del bot Telegram (iscritti): mai nel repo, vive nella cache Actions
+state/
