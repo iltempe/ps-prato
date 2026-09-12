@@ -161,7 +161,10 @@ HELP = (
     "Sono il bot di PS Prato Live.\n\n"
     "• /start — ti iscrivo e ricevi l'occupazione del PS ogni 15 minuti per 24 ore, poi mi fermo.\n"
     "• /ora — te la mando una volta sola, adesso.\n"
-    "• /stop — disattivo gli aggiornamenti.\n"
+    "• /stop — disattivo gli aggiornamenti.\n\n"
+    "🔒 Privacy: con /start salvo solo l'id di questa chat per inviarti gli aggiornamenti; "
+    "si cancella dopo 24h o subito con /stop. Con /ora non salvo nulla.\n"
+    f"Informativa completa: {DASHBOARD}privacy.html"
 )
 
 
@@ -178,7 +181,9 @@ def handle(update, state):
         state[key] = {"until": now + DURATA_ISCRIZIONE, "last_sent": now}
         save_state(state)
         send(chat_id, "✅ Iscritto! Ti manderò l'aggiornamento ogni 15 minuti per 24 ore. "
-                      "Scrivi /stop per fermarli.\n\n" + build_message())
+                      "Scrivi /stop per fermarli.\n"
+                      "🔒 Salvo solo l'id di questa chat per inviarti gli aggiornamenti; "
+                      "si cancella dopo 24h o con /stop.\n\n" + build_message())
     elif text in ("/stop", "stop"):
         if state.pop(key, None) is not None:
             save_state(state)

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy — PS Prato Live</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="index,follow">
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --ink:#1a1c1f; --muted:#6b7280; --line:#e5e7eb; --rosso:#e23b3b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0f1115; --card:#181b20; --ink:#e9eaec; --muted:#9aa3ad; --line:#282c33; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:760px;margin:0 auto;padding:22px 16px 60px}
+  .brand{display:flex;align-items:center;gap:13px;margin:0 0 4px}
+  .brandmark{width:40px;height:40px;flex:0 0 auto;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+  .brandname{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:0}
+  .brandname .live{color:var(--rosso)}
+  a{color:inherit}
+  .back{display:inline-block;color:var(--muted);font-size:13px;margin:2px 0 22px;text-decoration:none;border-bottom:1px solid var(--line)}
+  h1{font-size:24px;margin:14px 0 4px}
+  h2{font-size:16px;margin:26px 0 6px}
+  p,li{color:var(--ink)}
+  .muted{color:var(--muted);font-size:13px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}
+  ul{margin:6px 0 0;padding-left:20px}
+  li{margin:4px 0}
+  code{background:rgba(127,127,127,.14);padding:1px 5px;border-radius:5px;font-size:.92em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <svg class="brandmark" viewBox="0 0 64 64" role="img" aria-label="PS Prato Live">
+      <rect x="2" y="2" width="60" height="60" rx="14" fill="#e23b3b"/>
+      <rect x="26.5" y="12" width="11" height="40" rx="3.5" fill="#ffffff"/>
+      <rect x="12" y="26.5" width="40" height="11" rx="3.5" fill="#ffffff"/>
+    </svg>
+    <div><div class="brandname">PS Prato <span class="live">Live</span></div></div>
+  </div>
+  <a class="back" href="index.html">← Torna alla dashboard</a>
+
+  <h1>Informativa privacy &amp; cookie</h1>
+  <p class="muted">Ultimo aggiornamento: 12 settembre 2026</p>
+
+  <p>PS Prato Live è un progetto civico e indipendente che mostra l'occupazione del
+  Pronto Soccorso di Prato (Nuovo Ospedale S. Stefano) in forma aggregata. Questa
+  pagina spiega, in modo semplice, quali dati sono trattati e quali no.</p>
+
+  <div class="card">
+    <strong>In breve:</strong> il sito <strong>non usa cookie di profilazione</strong>,
+    non crea profili degli utenti e non vende dati. I dati sul Pronto Soccorso sono
+    <strong>numeri aggregati</strong>, non informazioni su singole persone.
+  </div>
+
+  <h2>Titolare del trattamento</h2>
+  <p>Matteo Tempestini (progetto <a href="https://github.com/iltempe" target="_blank" rel="noopener">@iltempe</a>).
+  Per esercitare i tuoi diritti o per domande puoi scrivere tramite il profilo GitHub
+  <code>@iltempe</code> o il bot Telegram <code>@ps_prato_live_bot</code>.</p>
+
+  <h2>Quali dati NON trattiamo</h2>
+  <ul>
+    <li>I dati mostrati sul Pronto Soccorso (presenze per codice colore, accessi annui)
+      sono <strong>aggregati e anonimi</strong>: nessun dato sanitario individuale, nessun nome, nessun caso singolo.</li>
+    <li>Nessun cookie di profilazione o pubblicitario, nessun tracciamento tra siti.</li>
+  </ul>
+
+  <h2>Statistiche di visita (senza cookie)</h2>
+  <p>Per capire quante persone visitano la pagina usiamo uno strumento di statistiche
+  <strong>aggregate e senza cookie</strong> (GoatCounter): registra in forma anonima e
+  aggregata elementi come pagina visitata, provenienza e tipo di dispositivo.
+  <strong>Non imposta cookie, non crea profili e non identifica i singoli visitatori</strong>,
+  perciò non è richiesto un banner di consenso.</p>
+
+  <h2>Bot Telegram</h2>
+  <p>Se usi il bot <code>@ps_prato_live_bot</code>:</p>
+  <ul>
+    <li>con <code>/ora</code> ricevi il dato del momento e non salviamo nulla;</li>
+    <li>con <code>/start</code> salviamo il tuo <strong>identificativo di chat</strong> e
+      l'orario di iscrizione, al solo scopo di inviarti l'aggiornamento ogni 15 minuti per 24 ore;</li>
+    <li>questi dati vengono <strong>cancellati automaticamente dopo 24 ore</strong> o subito con <code>/stop</code>;</li>
+    <li>sono conservati in forma privata e non compaiono nel dataset pubblico.</li>
+  </ul>
+  <p class="muted">La messaggistica è fornita da Telegram, secondo la sua informativa privacy.</p>
+
+  <h2>Hosting e log tecnici</h2>
+  <p>Il sito è ospitato su <strong>GitHub Pages</strong>. Per il funzionamento e la
+  sicurezza, GitHub può registrare dati tecnici (come l'indirizzo IP) secondo la propria
+  informativa privacy. Non abbiamo accesso a questi log in forma individuale.</p>
+
+  <h2>Base giuridica e conservazione</h2>
+  <ul>
+    <li>Statistiche aggregate senza cookie: legittimo interesse a misurare l'audience in forma anonima.</li>
+    <li>Bot Telegram: esecuzione del servizio richiesto da te; dati conservati max 24 ore.</li>
+  </ul>
+
+  <h2>Fornitori (responsabili del trattamento)</h2>
+  <ul>
+    <li>GitHub (hosting)</li>
+    <li>Telegram (messaggistica del bot)</li>
+    <li>GoatCounter (statistiche aggregate senza cookie)</li>
+  </ul>
+
+  <h2>I tuoi diritti</h2>
+  <p>Puoi chiedere accesso, rettifica o cancellazione dei tuoi dati. Per il bot, la
+  cancellazione è immediata con <code>/stop</code>. Per il resto usa i contatti sopra.</p>
+
+  <h2>Fonti dei dati</h2>
+  <p>Presenze in tempo reale: <strong>Azienda USL Toscana Centro</strong> (tramite l'aggregatore
+  prontosoccorso.live). Serie storica degli accessi: <strong>ARS Toscana</strong> (indicatore 1657).
+  Sono dati pubblici e aggregati.</p>
+</div>
+</body>
+</html>
