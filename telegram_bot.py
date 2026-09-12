@@ -104,8 +104,9 @@ def build_message() -> str:
         f"🩺 In trattamento: {trt}\n\n"
         f"Per codice colore:\n{per}\n\n"
         f"ℹ️ \"Presenti\" = quante persone ci sono adesso, non da quanto tempo "
-        f"(i tempi di permanenza non sono in questo dato).\n"
-        f"📊 Grafici e storico: {DASHBOARD}"
+        f"(i tempi di permanenza non sono in questo dato).\n\n"
+        f"📊 Grafici e storico: {DASHBOARD}\n"
+        f"Fonte: USL Toscana Centro (via prontosoccorso.live)"
     )
 
 
@@ -216,6 +217,14 @@ def poll():
     if not TOKEN:
         print("TG_BOT_TOKEN non impostato: niente da fare.", file=sys.stderr)
         return 0
+    try:
+        me = requests.get(f"{API}/getMe", timeout=HTTP_TIMEOUT).json()
+        if me.get("ok"):
+            print(f"getMe ok: @{me['result'].get('username')}")
+        else:
+            print(f"getMe FALLITO (token non valido?): {me}", file=sys.stderr)
+    except Exception as e:
+        print(f"getMe errore: {e}", file=sys.stderr)
     set_commands()
     durata_min = _int(os.environ.get("DURATA_MIN", "330")) or 330
     fine = time.time() + durata_min * 60
