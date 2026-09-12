@@ -1,0 +1,76 @@
+name: telegram-bot
+
+# Bot Telegram "dati su richiesta": risponde con l'occupazione del PS in tempo
+# reale. Gira in long-poll dentro un run a lunga durata (~5,5h) che si
+# auto-riavvia via PS_PAT -> presenza 24/7 senza server dedicati. Stesso schema
+# del workflow scrape-ps.
+#
+# Prerequisiti (una volta):
+#   1) crea il bot con @BotFather e copia il token
+#   2) gh secret set TG_BOT_TOKEN --repo iltempe/ps-prato   (incolla il token)
+#   3) PS_PAT gia' impostato (serve anche allo scraper) per l'auto-riavvio
+# Finche' TG_BOT_TOKEN non e' impostato, il workflow esce subito senza errori e
+# NON si riavvia (nessun loop a vuoto).
+
+on:
+  schedule:
+    - cron: "13,43 * * * *"   # kicker, minuti sfasati
+  workflow_dispatch:
+    inputs:
+      durata_min:
+        description: "Durata del loop in minuti (solo per test: es. 2)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: telegram-bot        # un solo poller alla volta (Telegram non ne ammette due)
+  cancel-in-progress: false
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      DURATA_MIN: "330"
+      TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Bot (long-poll)
+        if: ${{ env.TG_BOT_TOKEN != '' }}
+        env:
+          DUR: ${{ github.event.inputs.durata_min }}
+        run: |
+          [ -n "$DUR" ] && export DURATA_MIN="$DUR"
+          echo "Avvio bot (durata ${DURATA_MIN} min)"
+          python telegram_bot.py
+
+      - name: Avviso token mancante
+        if: ${{ env.TG_BOT_TOKEN == '' }}
+        run: |
+          echo "TG_BOT_TOKEN non impostato: bot non avviato. Imposta il secret e rilancia."
+
+      - name: Riavvia la catena
+        if: always()
+        env:
+          PS_PAT: ${{ secrets.PS_PAT }}
+        run: |
+          if [ -n "${PS_PAT:-}" ] && [ -n "${TG_BOT_TOKEN}" ]; then
+            code=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+              -H "Authorization: Bearer ${PS_PAT}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/telegram-bot.yml/dispatches" \
+              -d '{"ref":"main"}')
+            echo "self-restart telegram-bot -> HTTP $code (204 = ok)"
+          else
+            echo "PS_PAT o TG_BOT_TOKEN assenti: nessun auto-riavvio."
+          fi
