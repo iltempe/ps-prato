@@ -2717,3 +2717,9 @@ ts_scrape,regione,provincia,ospedale,codice,in_attesa,in_trattamento
 2026-09-14T20:49:03+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,azzurro,2,11
 2026-09-14T20:49:03+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,bianco,0,0
 2026-09-14T20:49:03+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,totali,22,53
+2026-09-14T21:04:05+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,rosso,0,2
+2026-09-14T21:04:05+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,giallo,0,13
+2026-09-14T21:04:05+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,verde,19,28
+2026-09-14T21:04:05+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,azzurro,3,11
+2026-09-14T21:04:05+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,bianco,0,0
+2026-09-14T21:04:05+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,totali,22,54
