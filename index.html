@@ -55,6 +55,7 @@
   .azzurro{background:var(--azzurro)} .bianco{background:var(--bianco);border:1px solid var(--line)}
   canvas{width:100%!important;height:300px!important}
   .fonte{color:var(--muted);font-size:11px;margin-top:10px;font-style:italic}
+  .fonte a, .sub a{color:inherit;text-decoration:underline;text-underline-offset:2px}
   .gloss summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
   .gloss summary::-webkit-details-marker{display:none}
   .gloss summary::before{content:"▸";color:var(--muted);font-size:11px;transition:transform .15s ease}
@@ -91,7 +92,8 @@
     </div>
   </div>
   <p class="sub">Nuovo Ospedale S. Stefano · dati campionati ogni ~15 min ·
-     fonte: <strong>Azienda USL Toscana Centro</strong> (via prontosoccorso.live)</p>
+     fonte: <strong><a href="https://www-old.uslcentro.toscana.it/psstat/pronto-soccorso-pa.php" target="_blank" rel="noopener">Azienda USL Toscana Centro</a></strong>
+     (via <a href="https://prontosoccorso.live/toscana/prato" target="_blank" rel="noopener">prontosoccorso.live</a>)</p>
 
   <div id="stato"></div>
 
@@ -110,7 +112,7 @@
   <div class="big">
     <div class="k" style="margin-bottom:10px">Andamento nel tempo — totale pazienti</div>
     <canvas id="chart"></canvas>
-    <div class="fonte">Fonte: USL Toscana Centro (via prontosoccorso.live) — presenze in tempo reale</div>
+    <div class="fonte">Fonte: <a href="https://www-old.uslcentro.toscana.it/psstat/pronto-soccorso-pa.php" target="_blank" rel="noopener">USL Toscana Centro</a> (via <a href="https://prontosoccorso.live/toscana/prato" target="_blank" rel="noopener">prontosoccorso.live</a>) — presenze in tempo reale</div>
   </div>
 
   <details class="big gloss">
