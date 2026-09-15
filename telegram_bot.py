@@ -30,6 +30,7 @@ import json
 import os
 import sys
 import time
+from datetime import datetime
 
 import requests
 
@@ -59,18 +60,36 @@ def _int(v):
 
 
 def snapshot():
-    """(ts, {codice: {att, trt}}) dell'ultimo giro, o None."""
+    """(ts, {codice: {att, trt}}, fermo_da) dell'ultimo giro, o None.
+
+    fermo_da = timestamp piu' vecchio della serie finale con valori identici
+    all'ultimo (per rilevare la fonte "congelata").
+    """
     r = requests.get(CSV_RAW, timeout=HTTP_TIMEOUT, headers={"Cache-Control": "no-cache"})
     r.raise_for_status()
     rows = list(csv.DictReader(io.StringIO(r.text)))
     if not rows:
         return None
-    last_ts = max(row["ts_scrape"] for row in rows)
-    cur = {}
+    groups = {}
     for row in rows:
-        if row["ts_scrape"] == last_ts:
-            cur[row["codice"]] = {"att": _int(row.get("in_attesa")), "trt": _int(row.get("in_trattamento"))}
-    return last_ts, cur
+        groups.setdefault(row["ts_scrape"], {})[row["codice"]] = (
+            _int(row.get("in_attesa")), _int(row.get("in_trattamento")))
+    stamps = sorted(groups)
+    last_ts = stamps[-1]
+    cur = {c: {"att": a, "trt": t} for c, (a, t) in groups[last_ts].items()}
+
+    def sig(ts):
+        g = groups[ts]
+        return "|".join(f"{g.get(c, (0, 0))[0]}/{g.get(c, (0, 0))[1]}" for c in CODICI + ["totali"])
+
+    cur_sig = sig(last_ts)
+    fermo_da = last_ts
+    for ts in reversed(stamps):
+        if sig(ts) == cur_sig:
+            fermo_da = ts
+        else:
+            break
+    return last_ts, cur, fermo_da
 
 
 def fmt_ts(iso: str) -> str:
@@ -90,13 +109,24 @@ def build_message() -> str:
         return f"Dati non raggiungibili in questo momento ({e}). Riprova tra poco."
     if not snap:
         return "Dati non disponibili al momento, riprova tra poco."
-    last_ts, cur = snap
+    last_ts, cur, fermo_da = snap
     tot = cur.get("totali", {"att": 0, "trt": 0})
     att, trt = tot["att"], tot["trt"]
     per = " · ".join(
         f"{EMOJI[c]} {c} {cur.get(c, {}).get('att', 0) + cur.get(c, {}).get('trt', 0)}" for c in CODICI
     )
+
+    avviso = ""
+    try:
+        ore = (datetime.fromisoformat(last_ts) - datetime.fromisoformat(fermo_da)).total_seconds() / 3600
+        if ore >= 2:
+            avviso = (f"⚠️ Dato fermo dalle {fmt_ts(fermo_da)}: la fonte (USL/aggregatore) "
+                      f"potrebbe non aggiornarsi ora, i valori sotto potrebbero non essere reali.\n\n")
+    except Exception:
+        pass
+
     return (
+        avviso +
         f"🏥 PS Prato — adesso\n"
         f"Aggiornato: {fmt_ts(last_ts)}\n\n"
         f"👥 Presenti: {att + trt}\n"

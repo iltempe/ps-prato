@@ -73,6 +73,8 @@
   .credits a:hover{color:var(--ink)}
   .err{background:#fde8e8;color:#9b1c1c;border:1px solid #f5c6c6;border-radius:10px;padding:12px 14px}
   @media (prefers-color-scheme: dark){.err{background:#3a1d1d;color:#f3c6c6;border-color:#5a2a2a}}
+  .warn{background:#fdf3d8;color:#7a5b00;border:1px solid #f0dfa0;border-radius:10px;padding:11px 14px;font-size:13.5px;margin:0 0 16px}
+  @media (prefers-color-scheme: dark){.warn{background:#37301c;color:#f0dca0;border-color:#5a4d2a}}
 </style>
 </head>
 <body>
@@ -92,6 +94,8 @@
      fonte: <strong>Azienda USL Toscana Centro</strong> (via prontosoccorso.live)</p>
 
   <div id="stato"></div>
+
+  <div id="avvisoFermo" class="warn" hidden></div>
 
   <div class="grid" id="kpi"></div>
 
@@ -187,6 +191,28 @@ fetch(CSV_URL, {cache:"no-store"})
     const stamps = [...byTs.keys()].sort();
     const lastTs = stamps[stamps.length-1];
     const last = byTs.get(lastTs);
+
+    // rilevamento "dato fermo": se l'istantanea e' identica da >= 2 ore,
+    // la fonte (USL/aggregatore) probabilmente non si aggiorna -> avviso.
+    (function(){
+      const sig = ts => {
+        const g = byTs.get(ts) || {};
+        return CODICI.concat("totali").map(c => { const x = g[c] || {}; return (x.att||0)+"/"+(x.trt||0); }).join("|");
+      };
+      const cur = sig(lastTs);
+      let fermoDa = lastTs;
+      for (let i = stamps.length - 1; i >= 0; i--) {
+        if (sig(stamps[i]) === cur) fermoDa = stamps[i]; else break;
+      }
+      const oreFerme = (new Date(lastTs) - new Date(fermoDa)) / 3600000;
+      if (oreFerme >= 2) {
+        const el = document.getElementById("avvisoFermo");
+        el.textContent = "⚠️ Dato fermo dalle " + fmtTs(fermoDa) +
+          ": la fonte (USL / aggregatore) potrebbe non aggiornarsi in questo momento, " +
+          "quindi i valori qui sotto potrebbero non essere reali.";
+        el.hidden = false;
+      }
+    })();
 
     // KPI
     const tot = last.totali || {att:0,trt:0};
