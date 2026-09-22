@@ -20,69 +20,116 @@
 <meta name="twitter:title" content="PS Prato Live — Pronto Soccorso di Prato">
 <meta name="twitter:description" content="Occupazione del PS in tempo reale + serie storica degli accessi.">
 <meta name="twitter:image" content="https://iltempe.github.io/ps-prato/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f6f7f9; --card:#fff; --ink:#1a1c1f; --muted:#6b7280; --line:#e5e7eb;
-    --rosso:#e23b3b; --giallo:#e6b800; --verde:#2fa84f; --azzurro:#3b93e2; --bianco:#9aa3ad;
+    --bg:#f4f2ee; --card:#ffffff; --ink:#17181a; --muted:#6b6f76; --line:#e6e3dc; --hair:#efece6;
+    --rosso:#e11d2a; --giallo:#eab308; --verde:#2fa84f; --azzurro:#2f6fe0; --bianco:#9aa3ad;
+    --shadow:0 1px 2px rgba(20,18,14,.04), 0 2px 8px rgba(20,18,14,.05);
+    --sans:'Work Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --disp:'Big Shoulders Display',var(--sans);
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --bg:#0f1115; --card:#181b20; --ink:#e9eaec; --muted:#9aa3ad; --line:#282c33; }
+    :root{ --bg:#111214; --card:#1a1c1f; --ink:#ececee; --muted:#9aa0a8; --line:#2a2d33; --hair:#23262b;
+      --azzurro:#4f8bf5; --shadow:0 1px 2px rgba(0,0,0,.3); }
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);
-    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:920px;margin:0 auto;padding:22px 16px 60px}
-  h1{font-size:20px;margin:0 0 2px}
-  .brand{display:flex;align-items:center;gap:13px;margin:0 0 4px}
-  .brandmark{width:44px;height:44px;flex:0 0 auto;border-radius:11px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
-  .brandname{font-size:23px;font-weight:700;letter-spacing:-.01em;margin:0;line-height:1.05}
+    font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:26px 18px 64px}
+  a{color:inherit}
+
+  /* masthead */
+  .brand{display:flex;align-items:center;gap:14px;margin:0 0 6px}
+  .brandmark{width:46px;height:46px;flex:0 0 auto;border-radius:12px;box-shadow:var(--shadow)}
+  .brandname{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.01em;margin:0;line-height:.95;text-transform:uppercase}
   .brandname .live{color:var(--rosso)}
-  .brandtag{color:var(--ink);font-size:14px;font-weight:500;margin-top:3px}
-  .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
-  .sub a{color:inherit}
+  .brandtag{color:var(--ink);font-size:14px;font-weight:500;margin-top:4px;opacity:.85}
+  .sub{color:var(--muted);font-size:12.5px;margin:0 0 22px;max-width:70ch}
+  .sub a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+
+  /* hero */
+  .hero{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+    padding:22px 24px;margin-bottom:16px;position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--rosso)}
+  .hero-label{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+  .hero-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 16px;margin-top:6px}
+  .hero-num{font-family:var(--mono);font-weight:600;font-size:clamp(52px,13vw,88px);line-height:1;letter-spacing:-.02em}
+  .hero-unit{font-size:19px;color:var(--muted);font-weight:500}
+  .pill{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:999px;
+    font-weight:600;font-size:13.5px;white-space:nowrap}
+  .pill::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
+  .pill.verde{background:#e7f6ec;color:#1e7a3a}
+  .pill.giallo{background:#fbf0cf;color:#8a6a00}
+  .pill.rosso{background:#fde4e5;color:#b3121d}
+  @media (prefers-color-scheme: dark){
+    .pill.verde{background:#15311e;color:#84d99d} .pill.giallo{background:#332b12;color:#f0d688} .pill.rosso{background:#391618;color:#f4a2a6}
+  }
+  .hero-break{margin-top:12px;color:var(--muted);font-size:14px}
+  .hero-break b{color:var(--ink);font-weight:600}
+  .hero-updated{margin-top:4px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  /* stat cards */
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-  .big{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:18px}
-  .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-  .v{font-size:30px;font-weight:700;margin-top:4px}
-  .v small{font-size:14px;font-weight:500;color:var(--muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 17px;box-shadow:var(--shadow)}
+  .k{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+  .v{font-family:var(--mono);font-size:30px;font-weight:600;margin-top:5px;line-height:1}
+  .v small{font-size:13px;font-weight:500;color:var(--muted);font-family:var(--sans)}
+  .cap{color:var(--muted);font-size:12px;margin-top:4px}
+
+  /* section cards */
+  .big{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:var(--shadow)}
+  .title{font-family:var(--disp);font-weight:700;font-size:20px;letter-spacing:.02em;text-transform:uppercase;margin:0 0 14px;line-height:1}
+
   table{width:100%;border-collapse:collapse;font-size:14px}
-  th,td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line)}
-  th:first-child,td:first-child{text-align:left}
-  thead th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
-  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
+  th,td{padding:9px 6px;text-align:right;border-bottom:1px solid var(--hair)}
+  tr:last-child td{border-bottom:0}
+  th:first-child,td:first-child{text-align:left;text-transform:capitalize}
+  thead th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+  tbody td{font-family:var(--mono);font-size:14px}
+  tbody td:first-child{font-family:var(--sans)}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:9px;vertical-align:middle}
   .rosso{background:var(--rosso)} .giallo{background:var(--giallo)} .verde{background:var(--verde)}
   .azzurro{background:var(--azzurro)} .bianco{background:var(--bianco);border:1px solid var(--line)}
+
   canvas{width:100%!important;height:300px!important}
-  .fonte{color:var(--muted);font-size:11px;margin-top:10px;font-style:italic}
-  .fonte a, .sub a{color:inherit;text-decoration:underline;text-underline-offset:2px}
-  .gloss summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+  .fonte{color:var(--muted);font-size:11px;margin-top:12px;font-style:italic}
+  .fonte a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+
+  .gloss summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:9px;font-family:var(--disp);font-weight:700;font-size:20px;letter-spacing:.02em;text-transform:uppercase}
   .gloss summary::-webkit-details-marker{display:none}
-  .gloss summary::before{content:"▸";color:var(--muted);font-size:11px;transition:transform .15s ease}
+  .gloss summary::before{content:"▸";color:var(--rosso);font-size:14px;transition:transform .15s ease}
   .gloss[open] summary::before{transform:rotate(90deg)}
-  .gloss-body{margin-top:14px;display:flex;flex-direction:column;gap:11px}
+  .gloss-body{margin-top:14px;display:flex;flex-direction:column;gap:12px}
   .gloss-item{font-size:14px;line-height:1.55;color:var(--ink)}
-  .gloss-item .gt{font-weight:700}
+  .gloss-item .gt{font-weight:600;color:var(--rosso)}
   .gloss .fonte{margin-top:2px}
-  .seg{display:inline-flex;margin:8px 0 4px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-  .seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;padding:6px 12px;cursor:pointer}
+
+  .seg{display:inline-flex;margin:2px 0 14px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+  .seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:500;font-size:13px;padding:7px 14px;cursor:pointer;transition:background .12s,color .12s}
   .seg button+button{border-left:1px solid var(--line)}
-  .seg button.on{background:var(--azzurro);color:#fff}
-  .foot{color:var(--muted);font-size:12px;margin-top:26px;line-height:1.6}
-  .credits{color:var(--muted);font-size:13px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
-  .credits a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
-  .credits a:hover{color:var(--ink)}
-  .err{background:#fde8e8;color:#9b1c1c;border:1px solid #f5c6c6;border-radius:10px;padding:12px 14px}
+  .seg button.on{background:var(--ink);color:var(--card)}
+
+  .foot{color:var(--muted);font-size:12px;margin-top:28px;line-height:1.6}
+  .credits{color:var(--muted);font-size:13px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:6px 14px}
+  .credits a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:1px}
+  .credits a:hover{color:var(--ink);border-color:var(--rosso)}
+
+  .err{background:#fde8e8;color:#9b1c1c;border:1px solid #f5c6c6;border-radius:12px;padding:12px 14px}
   @media (prefers-color-scheme: dark){.err{background:#3a1d1d;color:#f3c6c6;border-color:#5a2a2a}}
-  .warn{background:#fdf3d8;color:#7a5b00;border:1px solid #f0dfa0;border-radius:10px;padding:11px 14px;font-size:13.5px;margin:0 0 16px}
-  @media (prefers-color-scheme: dark){.warn{background:#37301c;color:#f0dca0;border-color:#5a4d2a}}
+  .warn{background:#fbf0cf;color:#7a5b00;border:1px solid #ecd899;border-radius:12px;padding:12px 15px;font-size:13.5px;margin:0 0 16px}
+  @media (prefers-color-scheme: dark){.warn{background:#302912;color:#f0dca0;border-color:#4d431f}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="brand">
     <svg class="brandmark" viewBox="0 0 64 64" role="img" aria-label="PS Prato Live">
-      <rect x="2" y="2" width="60" height="60" rx="14" fill="#e23b3b"/>
+      <rect x="2" y="2" width="60" height="60" rx="14" fill="#e11d2a"/>
       <rect x="26.5" y="12" width="11" height="40" rx="3.5" fill="#ffffff"/>
       <rect x="12" y="26.5" width="40" height="11" rx="3.5" fill="#ffffff"/>
     </svg>
@@ -96,13 +143,22 @@
      (via <a href="https://prontosoccorso.live/toscana/prato" target="_blank" rel="noopener">prontosoccorso.live</a>)</p>
 
   <div id="stato"></div>
-
   <div id="avvisoFermo" class="warn" hidden></div>
+
+  <section class="hero">
+    <div class="hero-label">Adesso al Pronto Soccorso</div>
+    <div class="hero-row">
+      <div><span class="hero-num" id="heroNum">—</span> <span class="hero-unit">persone</span></div>
+      <span class="pill" id="heroState" title="Scala indicativa sui presenti totali">—</span>
+    </div>
+    <div class="hero-break" id="heroBreak"></div>
+    <div class="hero-updated" id="aggiornato"></div>
+  </section>
 
   <div class="grid" id="kpi"></div>
 
   <div class="big">
-    <div class="k">Presenze per codice colore — ultimo rilevamento</div>
+    <h2 class="title">Presenze per codice colore</h2>
     <table id="tab">
       <thead><tr><th>Codice</th><th>In attesa</th><th>In trattamento</th><th>Totale</th></tr></thead>
       <tbody></tbody>
@@ -110,13 +166,13 @@
   </div>
 
   <div class="big">
-    <div class="k" style="margin-bottom:10px">Andamento nel tempo — totale pazienti</div>
+    <h2 class="title">Andamento nel tempo</h2>
     <canvas id="chart"></canvas>
     <div class="fonte">Fonte: <a href="https://www-old.uslcentro.toscana.it/psstat/pronto-soccorso-pa.php" target="_blank" rel="noopener">USL Toscana Centro</a> (via <a href="https://prontosoccorso.live/toscana/prato" target="_blank" rel="noopener">prontosoccorso.live</a>) — presenze in tempo reale</div>
   </div>
 
   <details class="big gloss">
-    <summary class="k">Come leggere i numeri</summary>
+    <summary>Come leggere i numeri</summary>
     <div class="gloss-body">
       <div class="gloss-item"><span class="gt">In attesa</span> — pazienti già registrati al triage e con un codice colore assegnato, ma non ancora presi in carico dal medico.</div>
       <div class="gloss-item"><span class="gt">In trattamento</span> — pazienti già presi in carico, dentro il percorso clinico. Non vuol dire "curati in questo istante": comprende la visita ma anche l'attesa di prelievi, referti, ecografie e del posto letto in reparto. Gran parte del tempo di permanenza sta qui.</div>
@@ -125,7 +181,7 @@
   </details>
 
   <div class="big">
-    <div class="k" style="margin-bottom:2px">Il carico nel tempo — accessi annui</div>
+    <h2 class="title">Il carico nel tempo — accessi annui</h2>
     <div class="seg" role="group" aria-label="Unità di misura">
       <button id="segAbs" class="on" type="button">Valori assoluti</button>
       <button id="segRate" type="button">Tasso per 1.000 ab.</button>
@@ -136,19 +192,18 @@
   </div>
 
   <p class="foot">
-    <span id="aggiornato"></span><br>
-    "In attesa" = pazienti in sala d'attesa; "in trattamento" = presi in carico ma ancora in PS.
+    "In attesa" = non ancora presi in carico; "in trattamento" = presi in carico ma ancora in PS.
     Un rilevamento vuoto (cache dell'API) viene saltato, quindi l'intervallo tra due punti può superare i 15 min.
     Pagina statica: si aggiorna a ogni commit del dataset.
   </p>
 
   <p class="credits">
-    A cura di <a href="https://github.com/iltempe" target="_blank" rel="noopener">Matteo Tempestini · @iltempe</a>
-    · <a href="https://github.com/iltempe/ps-prato" target="_blank" rel="noopener">Repository</a>
-    · <a href="https://github.com/iltempe/ps-prato/blob/main/data/presenze.csv" target="_blank" rel="noopener">Dataset (CSV)</a>
-    · <a href="https://t.me/ps_prato_live_bot" target="_blank" rel="noopener">💬 Bot Telegram</a>
-    · <a href="https://buymeacoffee.com/iltempe" target="_blank" rel="noopener">☕ Offrimi un caffè</a>
-    · <a href="privacy.html">Privacy</a>
+    <a href="https://github.com/iltempe" target="_blank" rel="noopener">Matteo Tempestini · @iltempe</a>
+    <a href="https://github.com/iltempe/ps-prato" target="_blank" rel="noopener">Repository</a>
+    <a href="https://github.com/iltempe/ps-prato/blob/main/data/presenze.csv" target="_blank" rel="noopener">Dataset (CSV)</a>
+    <a href="https://t.me/ps_prato_live_bot" target="_blank" rel="noopener">💬 Bot Telegram</a>
+    <a href="https://buymeacoffee.com/iltempe" target="_blank" rel="noopener">☕ Offrimi un caffè</a>
+    <a href="privacy.html">Privacy</a>
   </p>
 </div>
 
@@ -156,7 +211,19 @@
 <script>
 const CSV_URL = "data/presenze.csv";
 const CODICI = ["rosso","giallo","verde","azzurro","bianco"];
-const COL = {rosso:"#e23b3b",giallo:"#e6b800",verde:"#2fa84f",azzurro:"#3b93e2",bianco:"#9aa3ad"};
+const css = getComputedStyle(document.documentElement);
+const C = n => css.getPropertyValue(n).trim();
+const COL_AZ = C('--azzurro') || "#2f6fe0";
+const COL_RO = C('--rosso')   || "#e11d2a";
+const COL_VE = C('--verde')   || "#2fa84f";
+const GRID   = C('--line')    || "#e6e3dc";
+const TXT    = C('--muted')   || "#6b6f76";
+
+if (window.Chart) {
+  Chart.defaults.font.family = "'Work Sans',system-ui,sans-serif";
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = TXT;
+}
 
 function parseCSV(text){
   const lines = text.trim().split(/\r?\n/);
@@ -176,26 +243,29 @@ function fmtTs(iso){
   }catch(e){ return iso; }
 }
 
+// stato di affollamento (scala indicativa sui presenti totali)
+function crowdState(n){
+  if(n < 80)  return {t:"Regolare",        c:"verde"};
+  if(n < 110) return {t:"Affollato",       c:"giallo"};
+  return              {t:"Molto affollato", c:"rosso"};
+}
+
 fetch(CSV_URL, {cache:"no-store"})
   .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.text(); })
   .then(text=>{
     const rows = parseCSV(text);
     if(!rows.length) throw new Error("dataset vuoto");
 
-    // raggruppa per timestamp
     const byTs = new Map();
     for(const r of rows){
       if(!byTs.has(r.ts_scrape)) byTs.set(r.ts_scrape, {});
-      byTs.get(r.ts_scrape)[r.codice] = {
-        att:+r.in_attesa||0, trt:+r.in_trattamento||0
-      };
+      byTs.get(r.ts_scrape)[r.codice] = { att:+r.in_attesa||0, trt:+r.in_trattamento||0 };
     }
     const stamps = [...byTs.keys()].sort();
     const lastTs = stamps[stamps.length-1];
     const last = byTs.get(lastTs);
 
-    // rilevamento "dato fermo": se l'istantanea e' identica da >= 2 ore,
-    // la fonte (USL/aggregatore) probabilmente non si aggiorna -> avviso.
+    // rilevamento "dato fermo": istantanea identica da >= 2 ore -> avviso.
     (function(){
       const sig = ts => {
         const g = byTs.get(ts) || {};
@@ -216,14 +286,23 @@ fetch(CSV_URL, {cache:"no-store"})
       }
     })();
 
-    // KPI
     const tot = last.totali || {att:0,trt:0};
     const inPS = (tot.att||0)+(tot.trt||0);
+
+    // hero
+    document.getElementById("heroNum").textContent = inPS;
+    const st = crowdState(inPS);
+    const pill = document.getElementById("heroState");
+    pill.textContent = st.t; pill.className = "pill " + st.c;
+    document.getElementById("heroBreak").innerHTML =
+      `<b>${tot.att}</b> in attesa · <b>${tot.trt}</b> in trattamento`;
+    document.getElementById("aggiornato").textContent = "Aggiornato alle " + fmtTs(lastTs);
+
+    // stat cards
     document.getElementById("kpi").innerHTML = `
-      <div class="card"><div class="k">In Pronto Soccorso</div><div class="v">${inPS}</div></div>
-      <div class="card"><div class="k">In attesa</div><div class="v">${tot.att}</div></div>
-      <div class="card"><div class="k">In trattamento</div><div class="v">${tot.trt}</div></div>
-      <div class="card"><div class="k">Rilevamenti</div><div class="v">${stamps.length}<small> punti</small></div></div>`;
+      <div class="card"><div class="k">In attesa</div><div class="v">${tot.att}</div><div class="cap">non ancora presi in carico</div></div>
+      <div class="card"><div class="k">In trattamento</div><div class="v">${tot.trt}</div><div class="cap">dentro il percorso clinico</div></div>
+      <div class="card"><div class="k">Rilevamenti</div><div class="v">${stamps.length}</div><div class="cap">campioni raccolti</div></div>`;
 
     // tabella per codice
     const tb = document.querySelector("#tab tbody");
@@ -233,22 +312,20 @@ fetch(CSV_URL, {cache:"no-store"})
         <td>${v.att}</td><td>${v.trt}</td><td><strong>${(v.att||0)+(v.trt||0)}</strong></td></tr>`;
     }).join("");
 
-    document.getElementById("aggiornato").textContent = "Ultimo rilevamento: " + fmtTs(lastTs);
-
-    // grafico: totale att+trt e solo attesa
+    // grafico live
     const labels = stamps.map(fmtTs);
     const serieTot = stamps.map(t=>{const x=byTs.get(t).totali||{};return (x.att||0)+(x.trt||0);});
     const serieAtt = stamps.map(t=>{const x=byTs.get(t).totali||{};return (x.att||0);});
     new Chart(document.getElementById("chart"), {
       type:"line",
       data:{labels, datasets:[
-        {label:"Totale in PS", data:serieTot, borderColor:"#3b93e2", backgroundColor:"rgba(59,147,226,.12)", fill:true, tension:.25, pointRadius:0, borderWidth:2},
-        {label:"In attesa", data:serieAtt, borderColor:"#e23b3b", backgroundColor:"transparent", tension:.25, pointRadius:0, borderWidth:2}
+        {label:"Totale in PS", data:serieTot, borderColor:COL_AZ, backgroundColor:"rgba(47,111,224,.13)", fill:true, tension:.25, pointRadius:0, borderWidth:2},
+        {label:"In attesa", data:serieAtt, borderColor:COL_RO, backgroundColor:"transparent", tension:.25, pointRadius:0, borderWidth:2}
       ]},
       options:{responsive:true, maintainAspectRatio:false,
         interaction:{mode:"index",intersect:false},
-        scales:{y:{beginAtZero:true,ticks:{precision:0}}, x:{ticks:{maxTicksLimit:8,autoSkip:true}}},
-        plugins:{legend:{labels:{boxWidth:12}}}}
+        scales:{y:{beginAtZero:true,ticks:{precision:0},grid:{color:GRID}}, x:{ticks:{maxTicksLimit:8,autoSkip:true},grid:{display:false}}},
+        plugins:{legend:{labels:{boxWidth:12,usePointStyle:true,pointStyle:"line"}}}}
     });
   })
   .catch(e=>{
@@ -265,7 +342,6 @@ fetch(CSV_URL, {cache:"no-store"})
   const num = s => parseInt(String(s).replace(/[^0-9-]/g,""),10);
   const dec = s => parseFloat(String(s).replace(",", "."));   // tassi con virgola: "33,2" -> 33.2
 
-  // split che rispetta i campi tra virgolette (i tassi sono quotati con virgola interna)
   function splitCSVLine(line){
     const out=[]; let cur="", q=false;
     for(let i=0;i<line.length;i++){
@@ -290,21 +366,20 @@ fetch(CSV_URL, {cache:"no-store"})
       const tasCom  = rows.map(c=> dec(c[idx.tasso_x1000_comune]));
       const tasZona = rows.map(c=> dec(c[idx.tasso_x1000_zona]));
 
-      const C_COM = "#3b93e2", C_ZONA = "#2fa84f";
       const ds = (label,data,color)=>({
         label, data, borderColor:color, backgroundColor:"transparent",
         tension:.25, pointRadius:2, borderWidth:2
       });
 
-      let modo = "assoluti"; // "assoluti" | "tasso"
+      let modo = "assoluti";
 
       const chart = new Chart(document.getElementById("chartStorico"), {
         type:"line",
-        data:{ labels:anni, datasets:[ ds("Comune di Prato",accCom,C_COM), ds("Zona Pratese",accZona,C_ZONA) ] },
+        data:{ labels:anni, datasets:[ ds("Comune di Prato",accCom,COL_AZ), ds("Zona Pratese",accZona,COL_VE) ] },
         options:{ responsive:true, maintainAspectRatio:false,
           interaction:{mode:"index",intersect:false},
-          scales:{ y:{ beginAtZero:false, ticks:{precision:0} } },
-          plugins:{ legend:{labels:{boxWidth:12}},
+          scales:{ y:{ beginAtZero:false, ticks:{precision:0}, grid:{color:GRID} }, x:{grid:{display:false}} },
+          plugins:{ legend:{labels:{boxWidth:12,usePointStyle:true,pointStyle:"line"}},
             tooltip:{callbacks:{ label:ctx=> ctx.dataset.label+": "+ctx.formattedValue+(modo==="tasso"?" ‰":"") }} }
         }
       });
@@ -332,7 +407,7 @@ fetch(CSV_URL, {cache:"no-store"})
       }
       btnAbs.addEventListener("click", ()=>setModo("assoluti"));
       btnRate.addEventListener("click", ()=>setModo("tasso"));
-      render(); // stato iniziale: valori assoluti
+      render();
     })
     .catch(e=>{
       document.getElementById("statoStorico").innerHTML =
