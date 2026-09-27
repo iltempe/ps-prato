@@ -90,6 +90,18 @@
   .altri-sub{color:var(--muted);font-size:12px;margin-top:3px}
   .altri-item.best{border-color:var(--verde);box-shadow:0 0 0 1px var(--verde) inset}
   .altri-badge{display:inline-block;font-size:10.5px;font-weight:600;color:var(--verde);text-transform:uppercase;letter-spacing:.04em;margin-top:6px}
+  .altri-map,.hero-map{display:inline-block;font-size:12px;color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line)}
+  .altri-map{margin-top:8px}
+  .hero-map{margin-top:10px}
+  .altri-map:hover,.hero-map:hover{color:var(--rosso);border-color:var(--rosso)}
+
+  /* condivisione */
+  .share{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+  .share button,.share a{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);
+    font:inherit;font-size:13px;font-weight:500;padding:8px 13px;border-radius:10px;cursor:pointer;
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;line-height:1}
+  .share .sh-primary{background:var(--rosso);color:#fff;border-color:var(--rosso);font-weight:600}
+  .share button:hover,.share a:hover{border-color:var(--rosso)}
 
   /* section cards */
   .big{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:var(--shadow)}
@@ -164,7 +176,17 @@
     </div>
     <div class="hero-break" id="heroBreak"></div>
     <div class="hero-updated" id="aggiornato"></div>
+    <a id="heroMap" class="hero-map" target="_blank" rel="noopener" hidden>📍 Dove si trova (mappa)</a>
   </section>
+
+  <div class="share" id="share" hidden>
+    <button class="sh-primary" id="shShare" type="button">📤 Condividi</button>
+    <button id="shImg" type="button">⬇️ Immagine</button>
+    <a id="shWa" target="_blank" rel="noopener">WhatsApp</a>
+    <a id="shTg" target="_blank" rel="noopener">Telegram</a>
+    <a id="shX" target="_blank" rel="noopener">X</a>
+    <a id="shFb" target="_blank" rel="noopener">Facebook</a>
+  </div>
 
   <div class="grid" id="kpi"></div>
 
@@ -268,6 +290,104 @@ function crowdState(n){
   return              {t:"Molto affollato", c:"rosso"};
 }
 
+const SITE = "https://iltempe.github.io/ps-prato/";
+
+// --- card grafica condivisibile (PNG generato su canvas) -------------------
+function roundRect(g,x,y,w,h,r){
+  g.beginPath(); g.moveTo(x+r,y);
+  g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath();
+}
+function drawCard(d){
+  const W=1080,H=1350, cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  const g=cv.getContext("2d"); g.textBaseline="alphabetic";
+  g.fillStyle="#ffffff"; g.fillRect(0,0,W,H);
+  g.fillStyle="#e11d2a"; g.fillRect(0,0,W,18);
+  // logo
+  const lx=70,ly=88,ls=118;
+  roundRect(g,lx,ly,ls,ls,26); g.fillStyle="#e11d2a"; g.fill();
+  g.fillStyle="#fff";
+  g.fillRect(lx+ls/2-17,ly+24,34,ls-48);
+  g.fillRect(lx+24,ly+ls/2-17,ls-48,34);
+  g.fillStyle="#17181a"; g.font="800 64px 'Big Shoulders Display',Arial,sans-serif";
+  g.fillText("PS PRATO LIVE", lx+ls+28, ly+80);
+  // label + numero
+  g.fillStyle="#6b6f76"; g.font="600 34px 'Work Sans',Arial,sans-serif";
+  g.fillText("ADESSO AL PRONTO SOCCORSO", 70, 330);
+  g.fillStyle="#17181a"; g.font="600 236px 'IBM Plex Mono',monospace";
+  g.fillText(String(d.presenti), 64, 560);
+  const nw=g.measureText(String(d.presenti)).width;
+  g.fillStyle="#6b6f76"; g.font="500 52px 'Work Sans',Arial,sans-serif";
+  g.fillText("persone", 84+nw, 560);
+  // pill stato
+  const pc={verde:["#e7f6ec","#1e7a3a"],giallo:["#fbf0cf","#8a6a00"],rosso:["#fde4e5","#b3121d"]}[d.stateC]||["#eee","#333"];
+  g.font="600 40px 'Work Sans',Arial,sans-serif";
+  const pw=g.measureText(d.stateT).width+96;
+  roundRect(g,70,612,pw,74,37); g.fillStyle=pc[0]; g.fill();
+  g.fillStyle=pc[1]; g.beginPath(); g.arc(110,649,13,0,7); g.fill();
+  g.fillText(d.stateT,134,662);
+  // breakdown
+  g.fillStyle="#17181a"; g.font="500 46px 'Work Sans',Arial,sans-serif";
+  g.fillText(d.att+" in attesa   ·   "+d.trt+" in trattamento", 70, 784);
+  // codici colore
+  const colmap={rosso:"#e11d2a",giallo:"#eab308",verde:"#2fa84f",azzurro:"#2f6fe0",bianco:"#c9ced6"};
+  let x=70; const y=880; g.font="500 38px 'Work Sans',Arial,sans-serif";
+  for(const c of ["rosso","giallo","verde","azzurro","bianco"]){
+    const v=d.per[c]||{att:0,trt:0}, n=(v.att||0)+(v.trt||0);
+    g.fillStyle=colmap[c]; g.beginPath(); g.arc(x+16,y,16,0,7); g.fill();
+    if(c==="bianco"){ g.strokeStyle="#c9ced6"; g.lineWidth=2; g.stroke(); }
+    g.fillStyle="#17181a"; const lab=String(n);
+    g.fillText(lab, x+42, y+13);
+    x += 42 + g.measureText(lab).width + 48;
+  }
+  // timestamp + footer
+  g.fillStyle="#6b6f76"; g.font="500 32px 'IBM Plex Mono',monospace";
+  g.fillText("Aggiornato alle "+fmtTs(d.ts), 70, 1000);
+  g.strokeStyle="#e6e3dc"; g.lineWidth=2; g.beginPath(); g.moveTo(70,1176); g.lineTo(W-70,1176); g.stroke();
+  g.fillStyle="#17181a"; g.font="700 40px 'Big Shoulders Display',Arial,sans-serif";
+  g.fillText("iltempe.github.io/ps-prato", 70, 1248);
+  g.fillStyle="#6b6f76"; g.font="400 28px 'Work Sans',Arial,sans-serif";
+  g.fillText("Fonte: USL Toscana Centro · @iltempe", 70, 1294);
+  return cv;
+}
+
+// --- condivisione (Web Share + link ai social) -----------------------------
+function setupShare(d){
+  const bar=document.getElementById("share"); if(!bar) return;
+  const txt = `PS di Prato adesso: ${d.presenti} persone (${d.att} in attesa, ${d.trt} in trattamento) — ${d.state.t}.`;
+  const full = txt + " Dati live: " + SITE;
+  document.getElementById("shWa").href = "https://wa.me/?text="+encodeURIComponent(full);
+  document.getElementById("shTg").href = "https://t.me/share/url?url="+encodeURIComponent(SITE)+"&text="+encodeURIComponent(txt);
+  document.getElementById("shX").href  = "https://twitter.com/intent/tweet?text="+encodeURIComponent(txt)+"&url="+encodeURIComponent(SITE);
+  document.getElementById("shFb").href = "https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(SITE);
+
+  const cardData={presenti:d.presenti,att:d.att,trt:d.trt,stateT:d.state.t,stateC:d.state.c,ts:d.ts,per:d.per};
+  async function makeBlob(){
+    try{ await document.fonts.ready; }catch(e){}
+    return await new Promise(res=> drawCard(cardData).toBlob(res,"image/png"));
+  }
+  function download(blob){
+    const url=URL.createObjectURL(blob), a=document.createElement("a");
+    a.href=url; a.download="ps-prato-live.png"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+  }
+  document.getElementById("shImg").addEventListener("click", async ()=>{ download(await makeBlob()); });
+  document.getElementById("shShare").addEventListener("click", async ()=>{
+    try{
+      const blob=await makeBlob();
+      const file=new File([blob],"ps-prato-live.png",{type:"image/png"});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file], text:full, title:"PS Prato Live"});
+      } else if(navigator.share){
+        await navigator.share({text:full, url:SITE, title:"PS Prato Live"});
+      } else {
+        download(blob);
+      }
+    }catch(e){ /* condivisione annullata o non supportata */ }
+  });
+  bar.hidden=false;
+}
+
 // "Altri PS della Toscana": ultimo dato per ogni ospedale (Prato escluso),
 // ordinati dal meno affollato (presenti = in attesa + in trattamento).
 function renderAltri(allRows){
@@ -278,13 +398,14 @@ function renderAltri(allRows){
     const osp = r.ospedale || "";
     if(!osp || osp.includes("Prato")) continue;      // Prato è in primo piano
     let o = byOsp.get(osp);
-    if(!o){ o = {ts:"", codes:{}}; byOsp.set(osp, o); }
+    if(!o){ o = {ts:"", codes:{}, lat:r.lat, lng:r.lng}; byOsp.set(osp, o); }
+    if(r.lat && r.lng){ o.lat = r.lat; o.lng = r.lng; }
     if(r.ts_scrape > o.ts){ o.ts = r.ts_scrape; o.codes = {}; }
     if(r.ts_scrape === o.ts){ o.codes[r.codice] = { att:+r.in_attesa||0, trt:+r.in_trattamento||0 }; }
   }
   const list = [...byOsp.entries()].map(([osp,o])=>{
     const t = o.codes.totali || {att:0,trt:0};
-    return { osp, ts:o.ts, att:t.att, trt:t.trt, presenti:t.att+t.trt };
+    return { osp, ts:o.ts, att:t.att, trt:t.trt, presenti:t.att+t.trt, lat:o.lat, lng:o.lng };
   }).sort((a,b)=> a.presenti - b.presenti);
 
   if(!list.length){
@@ -295,12 +416,15 @@ function renderAltri(allRows){
     const parts = h.osp.split(" - ");
     const city = parts[0];
     const name = parts.slice(1).join(" - ") || h.osp;
+    const maps = (h.lat && h.lng)
+      ? `<a class="altri-map" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lng}">📍 Mappa</a>` : "";
     return `<div class="altri-item${i===0?' best':''}">
       <div class="city">${city}</div>
       <div class="osp">${name}</div>
       <div class="altri-num">${h.presenti} <small>presenti</small></div>
       <div class="altri-sub">${h.att} in attesa · agg. ${fmtTs(h.ts)}</div>
       ${i===0?'<div class="altri-badge">● meno affollato</div>':''}
+      <div>${maps}</div>
     </div>`;
   }).join("");
 }
@@ -356,6 +480,15 @@ fetch(CSV_URL, {cache:"no-store"})
     document.getElementById("heroBreak").innerHTML =
       `<b>${tot.att}</b> in attesa · <b>${tot.trt}</b> in trattamento`;
     document.getElementById("aggiornato").textContent = "Aggiornato alle " + fmtTs(lastTs);
+
+    // mappa Prato + condivisione
+    const plat = (rows[rows.length-1]||{}).lat, plng = (rows[rows.length-1]||{}).lng;
+    if(plat && plng){
+      const hm = document.getElementById("heroMap");
+      hm.href = "https://www.google.com/maps/search/?api=1&query="+plat+","+plng;
+      hm.hidden = false;
+    }
+    setupShare({ presenti:inPS, att:tot.att, trt:tot.trt, state:st, ts:lastTs, per:last });
 
     // stat cards
     document.getElementById("kpi").innerHTML = `
