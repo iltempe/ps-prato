@@ -59,15 +59,19 @@ def _int(v):
         return 0
 
 
+def _fetch_rows():
+    r = requests.get(CSV_RAW, timeout=HTTP_TIMEOUT, headers={"Cache-Control": "no-cache"})
+    r.raise_for_status()
+    return list(csv.DictReader(io.StringIO(r.text)))
+
+
 def snapshot():
-    """(ts, {codice: {att, trt}}, fermo_da) dell'ultimo giro, o None.
+    """(ts, {codice: {att, trt}}, fermo_da) dell'ultimo giro del PS di PRATO, o None.
 
     fermo_da = timestamp piu' vecchio della serie finale con valori identici
     all'ultimo (per rilevare la fonte "congelata").
     """
-    r = requests.get(CSV_RAW, timeout=HTTP_TIMEOUT, headers={"Cache-Control": "no-cache"})
-    r.raise_for_status()
-    rows = list(csv.DictReader(io.StringIO(r.text)))
+    rows = [row for row in _fetch_rows() if "Prato" in (row.get("ospedale") or "")]
     if not rows:
         return None
     groups = {}
@@ -140,6 +144,49 @@ def build_message() -> str:
     )
 
 
+def altri_summary():
+    """Per ogni ospedale non-Prato: ultimo dato (presenti, in attesa, ts),
+    ordinato dal meno affollato. Serve a scegliere dove andare adesso."""
+    per_osp = {}
+    for row in _fetch_rows():
+        osp = row.get("ospedale") or ""
+        if not osp or "Prato" in osp:
+            continue
+        o = per_osp.setdefault(osp, {"ts": "", "codes": {}})
+        ts = row["ts_scrape"]
+        if ts > o["ts"]:
+            o["ts"], o["codes"] = ts, {}
+        if ts == o["ts"]:
+            o["codes"][row["codice"]] = (_int(row.get("in_attesa")), _int(row.get("in_trattamento")))
+    out = []
+    for osp, o in per_osp.items():
+        att, trt = o["codes"].get("totali", (0, 0))
+        out.append({"osp": osp, "att": att, "trt": trt, "presenti": att + trt, "ts": o["ts"]})
+    out.sort(key=lambda x: x["presenti"])
+    return out
+
+
+def build_altri_message() -> str:
+    try:
+        lst = altri_summary()
+    except Exception as e:
+        return f"Dati non raggiungibili in questo momento ({e}). Riprova tra poco."
+    if not lst:
+        return "Non ho ancora dati sugli altri PS toscani. Riprova tra poco."
+    righe = ["🚑 Altri PS della Toscana — adesso", "(dal meno affollato al più affollato)\n"]
+    for i, h in enumerate(lst):
+        parts = h["osp"].split(" - ")
+        city = parts[0]
+        name = (parts[1] if len(parts) > 1 else h["osp"]).replace("Ospedale ", "").strip()
+        mark = "✅" if i == 0 else "•"
+        righe.append(f"{mark} {h['presenti']} presenti · {h['att']} in attesa — {name} ({city})")
+    righe.append("\nℹ️ Ospedali di dimensioni diverse: è il numero di presenti in questo momento, "
+                 "non un giudizio su qualità o tempi effettivi.")
+    righe.append(f"📊 Mappa e grafici: {DASHBOARD}\n"
+                 f"Fonte: USL Toscana Centro e AOU Senese (via prontosoccorso.live)")
+    return "\n".join(righe)
+
+
 # --- stato iscritti (persistito via cache Actions) -------------------------
 
 def load_state() -> dict:
@@ -177,7 +224,8 @@ def set_commands():
             f"{API}/setMyCommands",
             json={"commands": [
                 {"command": "start", "description": "Aggiornamenti ogni 15 min per 24h"},
-                {"command": "ora", "description": "Occupazione del PS adesso (una volta)"},
+                {"command": "ora", "description": "Occupazione del PS di Prato adesso (una volta)"},
+                {"command": "altri", "description": "Confronta gli altri PS toscani adesso"},
                 {"command": "stop", "description": "Disattiva gli aggiornamenti"},
                 {"command": "help", "description": "Come funziona"},
             ]},
@@ -189,8 +237,9 @@ def set_commands():
 
 HELP = (
     "Sono il bot di PS Prato Live.\n\n"
-    "• /start — ti iscrivo e ricevi l'occupazione del PS ogni 15 minuti per 24 ore, poi mi fermo.\n"
-    "• /ora — te la mando una volta sola, adesso.\n"
+    "• /start — ti iscrivo e ricevi l'occupazione del PS di Prato ogni 15 minuti per 24 ore, poi mi fermo.\n"
+    "• /ora — l'occupazione di Prato una volta sola, adesso.\n"
+    "• /altri — confronta gli altri PS toscani adesso (dal meno affollato), per scegliere dove andare.\n"
     "• /stop — disattivo gli aggiornamenti.\n\n"
     "🔒 Privacy: con /start salvo solo l'id di questa chat per inviarti gli aggiornamenti; "
     "si cancella dopo 24h o subito con /stop. Con /ora non salvo nulla.\n"
@@ -222,7 +271,9 @@ def handle(update, state):
             send(chat_id, "Non eri iscritto. /start per gli aggiornamenti automatici, /ora per un dato singolo.")
     elif text in ("/help", "help", "aiuto"):
         send(chat_id, HELP)
-    else:  # /ora o qualsiasi altro messaggio: dato singolo on-demand
+    elif text.startswith("/altri") or text in ("altri", "altri ps", "altri ps della toscana"):
+        send(chat_id, build_altri_message())
+    else:  # /ora o qualsiasi altro messaggio: dato singolo di Prato on-demand
         send(chat_id, build_message())
 
 

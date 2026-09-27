@@ -80,6 +80,17 @@
   .v small{font-size:13px;font-weight:500;color:var(--muted);font-family:var(--sans)}
   .cap{color:var(--muted);font-size:12px;margin-top:4px}
 
+  /* altri PS */
+  .altri-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px}
+  .altri-item{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--card)}
+  .altri-item .city{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+  .altri-item .osp{font-weight:600;font-size:13.5px;line-height:1.25;margin-top:1px}
+  .altri-num{font-family:var(--mono);font-size:24px;font-weight:600;margin-top:7px;line-height:1}
+  .altri-num small{font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:500}
+  .altri-sub{color:var(--muted);font-size:12px;margin-top:3px}
+  .altri-item.best{border-color:var(--verde);box-shadow:0 0 0 1px var(--verde) inset}
+  .altri-badge{display:inline-block;font-size:10.5px;font-weight:600;color:var(--verde);text-transform:uppercase;letter-spacing:.04em;margin-top:6px}
+
   /* section cards */
   .big{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:var(--shadow)}
   .title{font-family:var(--disp);font-weight:700;font-size:20px;letter-spacing:.02em;text-transform:uppercase;margin:0 0 14px;line-height:1}
@@ -191,6 +202,13 @@
     <div class="fonte">Fonte: ARS Toscana, indicatore 1657 — accessi in Pronto Soccorso per residenza</div>
   </div>
 
+  <div class="big">
+    <h2 class="title">Altri PS della Toscana — adesso</h2>
+    <p class="cap" style="margin:-6px 0 14px">Ordinati dal meno affollato in questo momento. Utile per orientarsi: meno persone presenti spesso vuol dire meno attesa. (Prato è qui sopra, in primo piano.)</p>
+    <div id="altri" class="altri-grid"></div>
+    <div class="fonte">Fonte: USL Toscana Centro e AOU Senese (via <a href="https://prontosoccorso.live" target="_blank" rel="noopener">prontosoccorso.live</a>) — presenze in tempo reale. Ospedali di dimensioni diverse: il confronto è sul numero di presenti, non sulla qualità o sui tempi effettivi.</div>
+  </div>
+
   <p class="foot">
     "In attesa" = non ancora presi in carico; "in trattamento" = presi in carico ma ancora in PS.
     Un rilevamento vuoto (cache dell'API) viene saltato, quindi l'intervallo tra due punti può superare i 15 min.
@@ -250,11 +268,52 @@ function crowdState(n){
   return              {t:"Molto affollato", c:"rosso"};
 }
 
+// "Altri PS della Toscana": ultimo dato per ogni ospedale (Prato escluso),
+// ordinati dal meno affollato (presenti = in attesa + in trattamento).
+function renderAltri(allRows){
+  const el = document.getElementById("altri");
+  if(!el) return;
+  const byOsp = new Map();
+  for(const r of allRows){
+    const osp = r.ospedale || "";
+    if(!osp || osp.includes("Prato")) continue;      // Prato è in primo piano
+    let o = byOsp.get(osp);
+    if(!o){ o = {ts:"", codes:{}}; byOsp.set(osp, o); }
+    if(r.ts_scrape > o.ts){ o.ts = r.ts_scrape; o.codes = {}; }
+    if(r.ts_scrape === o.ts){ o.codes[r.codice] = { att:+r.in_attesa||0, trt:+r.in_trattamento||0 }; }
+  }
+  const list = [...byOsp.entries()].map(([osp,o])=>{
+    const t = o.codes.totali || {att:0,trt:0};
+    return { osp, ts:o.ts, att:t.att, trt:t.trt, presenti:t.att+t.trt };
+  }).sort((a,b)=> a.presenti - b.presenti);
+
+  if(!list.length){
+    el.innerHTML = '<p class="cap">In attesa dei primi dati degli altri PS…</p>';
+    return;
+  }
+  el.innerHTML = list.map((h,i)=>{
+    const parts = h.osp.split(" - ");
+    const city = parts[0];
+    const name = parts.slice(1).join(" - ") || h.osp;
+    return `<div class="altri-item${i===0?' best':''}">
+      <div class="city">${city}</div>
+      <div class="osp">${name}</div>
+      <div class="altri-num">${h.presenti} <small>presenti</small></div>
+      <div class="altri-sub">${h.att} in attesa · agg. ${fmtTs(h.ts)}</div>
+      ${i===0?'<div class="altri-badge">● meno affollato</div>':''}
+    </div>`;
+  }).join("");
+}
+
 fetch(CSV_URL, {cache:"no-store"})
   .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.text(); })
   .then(text=>{
-    const rows = parseCSV(text);
-    if(!rows.length) throw new Error("dataset vuoto");
+    const allRows = parseCSV(text);
+    if(!allRows.length) throw new Error("dataset vuoto");
+    renderAltri(allRows);
+    // Prato in primo piano: hero, tabella, grafico e "dato fermo" usano solo Prato.
+    const rows = allRows.filter(r => (r.ospedale||"").includes("Prato"));
+    if(!rows.length) throw new Error("nessun dato per Prato");
 
     const byTs = new Map();
     for(const r of rows){
