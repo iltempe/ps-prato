@@ -38,7 +38,7 @@ TOKEN = os.environ.get("TG_BOT_TOKEN", "").strip()
 API = f"https://api.telegram.org/bot{TOKEN}"
 
 CSV_RAW = "https://raw.githubusercontent.com/iltempe/ps-prato/main/data/presenze.csv"
-DASHBOARD = "https://iltempe.github.io/ps-prato/"
+DASHBOARD = "https://pspratolive.it/"
 
 CODICI = ["rosso", "giallo", "verde", "azzurro", "bianco"]
 EMOJI = {"rosso": "🔴", "giallo": "🟡", "verde": "🟢", "azzurro": "🔵", "bianco": "⚪"}

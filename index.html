@@ -12,14 +12,14 @@
 <meta property="og:site_name" content="PS Prato Live">
 <meta property="og:title" content="PS Prato Live — Pronto Soccorso di Prato">
 <meta property="og:description" content="Occupazione del PS in tempo reale + serie storica degli accessi. Fonti: USL Toscana Centro, ARS Toscana.">
-<meta property="og:url" content="https://iltempe.github.io/ps-prato/">
-<meta property="og:image" content="https://iltempe.github.io/ps-prato/og-image.png">
+<meta property="og:url" content="https://pspratolive.it/">
+<meta property="og:image" content="https://pspratolive.it/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="PS Prato Live — Pronto Soccorso di Prato">
 <meta name="twitter:description" content="Occupazione del PS in tempo reale + serie storica degli accessi.">
-<meta name="twitter:image" content="https://iltempe.github.io/ps-prato/og-image.png">
+<meta name="twitter:image" content="https://pspratolive.it/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -296,7 +296,7 @@ function crowdState(n){
   return              {t:"Molto affollato", c:"rosso"};
 }
 
-const SITE = "https://iltempe.github.io/ps-prato/";
+const SITE = "https://pspratolive.it/";
 
 // --- card grafica condivisibile (PNG generato su canvas) -------------------
 function roundRect(g,x,y,w,h,r){
@@ -351,7 +351,7 @@ function drawCard(d){
   g.fillText("Aggiornato alle "+fmtTs(d.ts), 70, 1000);
   g.strokeStyle="#e6e3dc"; g.lineWidth=2; g.beginPath(); g.moveTo(70,1176); g.lineTo(W-70,1176); g.stroke();
   g.fillStyle="#17181a"; g.font="700 40px 'Big Shoulders Display',Arial,sans-serif";
-  g.fillText("iltempe.github.io/ps-prato", 70, 1248);
+  g.fillText("pspratolive.it", 70, 1248);
   g.fillStyle="#6b6f76"; g.font="400 28px 'Work Sans',Arial,sans-serif";
   g.fillText("Fonte: USL Toscana Centro · @iltempe", 70, 1294);
   return cv;
