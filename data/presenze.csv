@@ -37229,3 +37229,21 @@ ts_scrape,regione,provincia,ospedale,codice,in_attesa,in_trattamento,lat,lng
 2026-10-02T07:48:49+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,verde,0,0,43.3435671,11.3296733
 2026-10-02T07:48:49+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,bianco,2,1,43.3435671,11.3296733
 2026-10-02T07:48:49+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,totali,4,26,43.3435671,11.3296733
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,rosso,0,0,43.9185872,10.9034996
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,giallo,0,11,43.9185872,10.9034996
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,verde,6,26,43.9185872,10.9034996
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,azzurro,2,4,43.9185872,10.9034996
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,bianco,2,2,43.9185872,10.9034996
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,totali,10,43,43.9185872,10.9034996
+2026-10-02T08:38:58+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,rosso,0,0,44.0561621,10.7883016
+2026-10-02T08:38:58+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,giallo,0,0,44.0561621,10.7883016
+2026-10-02T08:38:58+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,verde,0,0,44.0561621,10.7883016
+2026-10-02T08:38:58+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,azzurro,0,0,44.0561621,10.7883016
+2026-10-02T08:38:58+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,bianco,0,1,44.0561621,10.7883016
+2026-10-02T08:38:58+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,totali,0,1,44.0561621,10.7883016
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,rosso,0,0,43.9032734,10.6907946
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,giallo,0,5,43.9032734,10.6907946
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,verde,0,6,43.9032734,10.6907946
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,azzurro,1,2,43.9032734,10.6907946
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,bianco,1,1,43.9032734,10.6907946
+2026-10-02T08:38:58+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,totali,2,14,43.9032734,10.6907946
