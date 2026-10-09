@@ -79973,3 +79973,63 @@ ts_scrape,regione,provincia,ospedale,codice,in_attesa,in_trattamento,lat,lng
 2026-10-09T12:12:09+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,verde,2,11,43.3435671,11.3296733
 2026-10-09T12:12:09+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,bianco,3,2,43.3435671,11.3296733
 2026-10-09T12:12:09+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,totali,7,51,43.3435671,11.3296733
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale San Giovanni di Dio Pronto Soccorso,rosso,0,6,43.7574418,11.2034533
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale San Giovanni di Dio Pronto Soccorso,giallo,0,13,43.7574418,11.2034533
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale San Giovanni di Dio Pronto Soccorso,verde,15,56,43.7574418,11.2034533
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale San Giovanni di Dio Pronto Soccorso,azzurro,0,2,43.7574418,11.2034533
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale San Giovanni di Dio Pronto Soccorso,bianco,2,2,43.7574418,11.2034533
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale San Giovanni di Dio Pronto Soccorso,totali,17,79,43.7574418,11.2034533
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale Santa Maria Nuova Pronto Soccorso,rosso,0,2,43.7734519,11.259605
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale Santa Maria Nuova Pronto Soccorso,giallo,0,6,43.7734519,11.259605
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale Santa Maria Nuova Pronto Soccorso,verde,1,28,43.7734519,11.259605
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale Santa Maria Nuova Pronto Soccorso,azzurro,0,8,43.7734519,11.259605
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale Santa Maria Nuova Pronto Soccorso,bianco,0,2,43.7734519,11.259605
+2026-10-09T12:27:46+02:00,toscana,firenze,Firenze - Ospedale Santa Maria Nuova Pronto Soccorso,totali,1,46,43.7734519,11.259605
+2026-10-09T12:27:46+02:00,toscana,firenze,Bagno a Ripoli - Ospedale Santa Maria Annunziata,rosso,0,0,43.7321241,11.3056594
+2026-10-09T12:27:46+02:00,toscana,firenze,Bagno a Ripoli - Ospedale Santa Maria Annunziata,giallo,0,8,43.7321241,11.3056594
+2026-10-09T12:27:46+02:00,toscana,firenze,Bagno a Ripoli - Ospedale Santa Maria Annunziata,verde,4,43,43.7321241,11.3056594
+2026-10-09T12:27:46+02:00,toscana,firenze,Bagno a Ripoli - Ospedale Santa Maria Annunziata,azzurro,4,11,43.7321241,11.3056594
+2026-10-09T12:27:46+02:00,toscana,firenze,Bagno a Ripoli - Ospedale Santa Maria Annunziata,bianco,1,1,43.7321241,11.3056594
+2026-10-09T12:27:46+02:00,toscana,firenze,Bagno a Ripoli - Ospedale Santa Maria Annunziata,totali,9,63,43.7321241,11.3056594
+2026-10-09T12:27:46+02:00,toscana,firenze,Empoli - Ospedale San Giuseppe,rosso,0,0,43.7222153,10.9340379
+2026-10-09T12:27:46+02:00,toscana,firenze,Empoli - Ospedale San Giuseppe,giallo,0,9,43.7222153,10.9340379
+2026-10-09T12:27:46+02:00,toscana,firenze,Empoli - Ospedale San Giuseppe,verde,13,34,43.7222153,10.9340379
+2026-10-09T12:27:46+02:00,toscana,firenze,Empoli - Ospedale San Giuseppe,azzurro,0,6,43.7222153,10.9340379
+2026-10-09T12:27:46+02:00,toscana,firenze,Empoli - Ospedale San Giuseppe,bianco,1,2,43.7222153,10.9340379
+2026-10-09T12:27:46+02:00,toscana,firenze,Empoli - Ospedale San Giuseppe,totali,14,51,43.7222153,10.9340379
+2026-10-09T12:27:46+02:00,toscana,firenze,Borgo San Lorenzo - Nuovo Ospedale del Mugello,rosso,0,1,43.9584307,11.3752875
+2026-10-09T12:27:46+02:00,toscana,firenze,Borgo San Lorenzo - Nuovo Ospedale del Mugello,giallo,0,2,43.9584307,11.3752875
+2026-10-09T12:27:46+02:00,toscana,firenze,Borgo San Lorenzo - Nuovo Ospedale del Mugello,verde,0,8,43.9584307,11.3752875
+2026-10-09T12:27:46+02:00,toscana,firenze,Borgo San Lorenzo - Nuovo Ospedale del Mugello,azzurro,0,3,43.9584307,11.3752875
+2026-10-09T12:27:46+02:00,toscana,firenze,Borgo San Lorenzo - Nuovo Ospedale del Mugello,bianco,0,0,43.9584307,11.3752875
+2026-10-09T12:27:46+02:00,toscana,firenze,Borgo San Lorenzo - Nuovo Ospedale del Mugello,totali,0,14,43.9584307,11.3752875
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,rosso,0,1,43.9185872,10.9034996
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,giallo,1,13,43.9185872,10.9034996
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,verde,11,43,43.9185872,10.9034996
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,azzurro,3,8,43.9185872,10.9034996
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,bianco,2,2,43.9185872,10.9034996
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pistoia - Ospedale San Jacopo,totali,17,67,43.9185872,10.9034996
+2026-10-09T12:27:46+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,rosso,0,0,44.0561621,10.7883016
+2026-10-09T12:27:46+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,giallo,0,0,44.0561621,10.7883016
+2026-10-09T12:27:46+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,verde,0,0,44.0561621,10.7883016
+2026-10-09T12:27:46+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,azzurro,0,0,44.0561621,10.7883016
+2026-10-09T12:27:46+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,bianco,0,1,44.0561621,10.7883016
+2026-10-09T12:27:46+02:00,toscana,pistoia,San Marcello Piteglio - P.I.O.T,totali,0,1,44.0561621,10.7883016
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,rosso,0,0,43.9032734,10.6907946
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,giallo,1,6,43.9032734,10.6907946
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,verde,2,23,43.9032734,10.6907946
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,azzurro,0,5,43.9032734,10.6907946
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,bianco,1,1,43.9032734,10.6907946
+2026-10-09T12:27:46+02:00,toscana,pistoia,Pescia - Ospedale SS. Cosma e Damiano,totali,4,35,43.9032734,10.6907946
+2026-10-09T12:27:46+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,rosso,1,7,43.8906812,11.0643568
+2026-10-09T12:27:46+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,giallo,0,34,43.8906812,11.0643568
+2026-10-09T12:27:46+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,verde,16,90,43.8906812,11.0643568
+2026-10-09T12:27:46+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,azzurro,2,16,43.8906812,11.0643568
+2026-10-09T12:27:46+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,bianco,0,1,43.8906812,11.0643568
+2026-10-09T12:27:46+02:00,toscana,prato,Prato - Nuovo Ospedale S. Stefano,totali,19,148,43.8906812,11.0643568
+2026-10-09T12:27:46+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,rosso,0,3,43.3435671,11.3296733
+2026-10-09T12:27:46+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,arancione,0,5,43.3435671,11.3296733
+2026-10-09T12:27:46+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,azzurro,4,29,43.3435671,11.3296733
+2026-10-09T12:27:46+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,verde,1,13,43.3435671,11.3296733
+2026-10-09T12:27:46+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,bianco,1,2,43.3435671,11.3296733
+2026-10-09T12:27:46+02:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,totali,6,52,43.3435671,11.3296733
