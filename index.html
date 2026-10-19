@@ -71,6 +71,7 @@
   .hero-break{margin-top:12px;color:var(--muted);font-size:14px}
   .hero-break b{color:var(--ink);font-weight:600}
   .hero-updated{margin-top:4px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .hero-note{margin-top:10px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
 
   /* stat cards */
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
@@ -179,6 +180,7 @@
     <div class="hero-break" id="heroBreak"></div>
     <div class="hero-updated" id="aggiornato"></div>
     <a id="heroMap" class="hero-map" target="_blank" rel="noopener" hidden>📍 Dove si trova (mappa)</a>
+    <div class="hero-note">ℹ️ I dati di Prato non includono il Pronto Soccorso pediatrico.</div>
   </section>
 
   <div class="share" id="share" hidden>
@@ -499,8 +501,7 @@ fetch(CSV_URL, {cache:"no-store"})
     // stat cards
     document.getElementById("kpi").innerHTML = `
       <div class="card"><div class="k">In attesa</div><div class="v">${tot.att}</div><div class="cap">non ancora presi in carico</div></div>
-      <div class="card"><div class="k">In trattamento</div><div class="v">${tot.trt}</div><div class="cap">dentro il percorso clinico</div></div>
-      <div class="card"><div class="k">Rilevamenti</div><div class="v">${stamps.length}</div><div class="cap">campioni raccolti</div></div>`;
+      <div class="card"><div class="k">In trattamento</div><div class="v">${tot.trt}</div><div class="cap">dentro il percorso clinico</div></div>`;
 
     // tabella per codice
     const tb = document.querySelector("#tab tbody");
