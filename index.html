@@ -247,6 +247,7 @@
     <a href="https://github.com/iltempe" target="_blank" rel="noopener">Matteo Tempestini · @iltempe</a>
     <a href="https://github.com/iltempe/ps-prato" target="_blank" rel="noopener">Repository</a>
     <a href="https://github.com/iltempe/ps-prato/blob/main/data/presenze.csv" target="_blank" rel="noopener">Dataset (CSV)</a>
+    <a href="https://github.com/iltempe/ps-prato/tree/main/data/ufficiali" target="_blank" rel="noopener">📄 Dati ufficiali ASL</a>
     <a href="https://t.me/ps_prato_live_bot" target="_blank" rel="noopener">💬 Bot Telegram</a>
     <a href="https://buymeacoffee.com/iltempe" target="_blank" rel="noopener">☕ Offrimi un caffè</a>
     <a href="privacy.html">Privacy</a>
@@ -255,7 +256,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-const CSV_URL = "data/presenze.csv";
+const LATEST_URL = "data/latest.json";   // snapshot leggero (pochi KB) invece dei 16+ MB del CSV storico
 const CODICI = ["rosso","giallo","verde","azzurro","bianco"];
 const css = getComputedStyle(document.documentElement);
 const C = n => css.getPropertyValue(n).trim();
@@ -396,23 +397,16 @@ function setupShare(d){
 
 // "Altri PS della Toscana": ultimo dato per ogni ospedale (Prato escluso),
 // ordinati dal meno affollato (presenti = in attesa + in trattamento).
-function renderAltri(allRows){
+function renderAltri(ospedali){
   const el = document.getElementById("altri");
   if(!el) return;
-  const byOsp = new Map();
-  for(const r of allRows){
-    const osp = r.ospedale || "";
-    if(!osp || osp.includes("Prato")) continue;      // Prato è in primo piano
-    let o = byOsp.get(osp);
-    if(!o){ o = {ts:"", codes:{}, lat:r.lat, lng:r.lng}; byOsp.set(osp, o); }
-    if(r.lat && r.lng){ o.lat = r.lat; o.lng = r.lng; }
-    if(r.ts_scrape > o.ts){ o.ts = r.ts_scrape; o.codes = {}; }
-    if(r.ts_scrape === o.ts){ o.codes[r.codice] = { att:+r.in_attesa||0, trt:+r.in_trattamento||0 }; }
-  }
-  const list = [...byOsp.entries()].map(([osp,o])=>{
-    const t = o.codes.totali || {att:0,trt:0};
-    return { osp, ts:o.ts, att:t.att, trt:t.trt, presenti:t.att+t.trt, lat:o.lat, lng:o.lng };
-  }).sort((a,b)=> a.presenti - b.presenti);
+  const list = (ospedali||[])
+    .filter(o => !((o.ospedale||"").includes("Prato")))   // Prato è in primo piano
+    .map(o=>{
+      const t = (o.codici && o.codici.totali) || {att:0,trt:0};
+      return { osp:o.ospedale, ts:o.ts, att:+t.att||0, trt:+t.trt||0,
+               presenti:(+t.att||0)+(+t.trt||0), lat:o.lat, lng:o.lng };
+    }).sort((a,b)=> a.presenti - b.presenti);
 
   if(!list.length){
     el.innerHTML = '<p class="cap">In attesa dei primi dati degli altri PS…</p>';
@@ -435,37 +429,31 @@ function renderAltri(allRows){
   }).join("");
 }
 
-fetch(CSV_URL, {cache:"no-store"})
-  .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.text(); })
-  .then(text=>{
-    const allRows = parseCSV(text);
-    if(!allRows.length) throw new Error("dataset vuoto");
-    renderAltri(allRows);
+fetch(LATEST_URL, {cache:"no-store"})
+  .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+  .then(d=>{
+    const ospedali = d.ospedali || [];
+    renderAltri(ospedali);
+
     // Prato in primo piano: hero, tabella, grafico e "dato fermo" usano solo Prato.
-    const rows = allRows.filter(r => (r.ospedale||"").includes("Prato"));
-    if(!rows.length) throw new Error("nessun dato per Prato");
+    const prato = ospedali.find(o => (o.ospedale||"").includes("Prato"));
+    if(!prato) throw new Error("nessun dato per Prato");
+    const last = prato.codici || {};        // {codice: {att, trt}}
+    const lastTs = prato.ts;
+    const tot = last.totali || {att:0,trt:0};
+    const inPS = (+tot.att||0)+(+tot.trt||0);
 
-    const byTs = new Map();
-    for(const r of rows){
-      if(!byTs.has(r.ts_scrape)) byTs.set(r.ts_scrape, {});
-      byTs.get(r.ts_scrape)[r.codice] = { att:+r.in_attesa||0, trt:+r.in_trattamento||0 };
-    }
-    const stamps = [...byTs.keys()].sort();
-    const lastTs = stamps[stamps.length-1];
-    const last = byTs.get(lastTs);
-
-    // rilevamento "dato fermo": istantanea identica da >= 2 ore -> avviso.
+    // rilevamento "dato fermo": serie Prato (totali) identica da >= 2 ore -> avviso.
+    const serie = d.prato_serie || [];
     (function(){
-      const sig = ts => {
-        const g = byTs.get(ts) || {};
-        return CODICI.concat("totali").map(c => { const x = g[c] || {}; return (x.att||0)+"/"+(x.trt||0); }).join("|");
-      };
-      const cur = sig(lastTs);
-      let fermoDa = lastTs;
-      for (let i = stamps.length - 1; i >= 0; i--) {
-        if (sig(stamps[i]) === cur) fermoDa = stamps[i]; else break;
+      if(!serie.length) return;
+      const sig = s => (+s.att||0)+"/"+(+s.trt||0);
+      const cur = sig(serie[serie.length-1]);
+      let fermoDa = serie[serie.length-1].ts;
+      for (let i = serie.length - 1; i >= 0; i--) {
+        if (sig(serie[i]) === cur) fermoDa = serie[i].ts; else break;
       }
-      const oreFerme = (new Date(lastTs) - new Date(fermoDa)) / 3600000;
+      const oreFerme = (new Date(serie[serie.length-1].ts) - new Date(fermoDa)) / 3600000;
       if (oreFerme >= 2) {
         const el = document.getElementById("avvisoFermo");
         el.textContent = "⚠️ Dato fermo dalle " + fmtTs(fermoDa) +
@@ -475,44 +463,40 @@ fetch(CSV_URL, {cache:"no-store"})
       }
     })();
 
-    const tot = last.totali || {att:0,trt:0};
-    const inPS = (tot.att||0)+(tot.trt||0);
-
     // hero
     document.getElementById("heroNum").textContent = inPS;
     const st = crowdState(inPS);
     const pill = document.getElementById("heroState");
     pill.textContent = st.t; pill.className = "pill " + st.c;
     document.getElementById("heroBreak").innerHTML =
-      `<b>${tot.att}</b> in attesa · <b>${tot.trt}</b> in trattamento`;
+      `<b>${+tot.att||0}</b> in attesa · <b>${+tot.trt||0}</b> in trattamento`;
     document.getElementById("aggiornato").textContent = "Aggiornato alle " + fmtTs(lastTs);
 
     // mappa Prato + condivisione
-    const plat = (rows[rows.length-1]||{}).lat, plng = (rows[rows.length-1]||{}).lng;
-    if(plat && plng){
+    if(prato.lat && prato.lng){
       const hm = document.getElementById("heroMap");
-      hm.href = "https://www.google.com/maps/search/?api=1&query="+plat+","+plng;
+      hm.href = "https://www.google.com/maps/search/?api=1&query="+prato.lat+","+prato.lng;
       hm.hidden = false;
     }
-    setupShare({ presenti:inPS, att:tot.att, trt:tot.trt, state:st, ts:lastTs, per:last });
+    setupShare({ presenti:inPS, att:(+tot.att||0), trt:(+tot.trt||0), state:st, ts:lastTs, per:last });
 
     // stat cards
     document.getElementById("kpi").innerHTML = `
-      <div class="card"><div class="k">In attesa</div><div class="v">${tot.att}</div><div class="cap">non ancora presi in carico</div></div>
-      <div class="card"><div class="k">In trattamento</div><div class="v">${tot.trt}</div><div class="cap">dentro il percorso clinico</div></div>`;
+      <div class="card"><div class="k">In attesa</div><div class="v">${+tot.att||0}</div><div class="cap">non ancora presi in carico</div></div>
+      <div class="card"><div class="k">In trattamento</div><div class="v">${+tot.trt||0}</div><div class="cap">dentro il percorso clinico</div></div>`;
 
     // tabella per codice
     const tb = document.querySelector("#tab tbody");
     tb.innerHTML = CODICI.map(c=>{
       const v = last[c]||{att:0,trt:0};
       return `<tr><td><span class="dot ${c}"></span>${c}</td>
-        <td>${v.att}</td><td>${v.trt}</td><td><strong>${(v.att||0)+(v.trt||0)}</strong></td></tr>`;
+        <td>${+v.att||0}</td><td>${+v.trt||0}</td><td><strong>${(+v.att||0)+(+v.trt||0)}</strong></td></tr>`;
     }).join("");
 
-    // grafico live
-    const labels = stamps.map(fmtTs);
-    const serieTot = stamps.map(t=>{const x=byTs.get(t).totali||{};return (x.att||0)+(x.trt||0);});
-    const serieAtt = stamps.map(t=>{const x=byTs.get(t).totali||{};return (x.att||0);});
+    // grafico live (serie recente di Prato)
+    const labels = serie.map(s=>fmtTs(s.ts));
+    const serieTot = serie.map(s=>(+s.att||0)+(+s.trt||0));
+    const serieAtt = serie.map(s=>(+s.att||0));
     new Chart(document.getElementById("chart"), {
       type:"line",
       data:{labels, datasets:[
@@ -527,8 +511,8 @@ fetch(CSV_URL, {cache:"no-store"})
   })
   .catch(e=>{
     document.getElementById("stato").innerHTML =
-      `<div class="err">Impossibile caricare i dati (<code>${CSV_URL}</code>): ${e.message}.
-       Se stai aprendo il file in locale col doppio click, il browser blocca la lettura del CSV:
+      `<div class="err">Impossibile caricare i dati (<code>${LATEST_URL}</code>): ${e.message}.
+       Se stai aprendo il file in locale col doppio click, il browser blocca la lettura del file:
        apri la pagina tramite GitHub Pages oppure avvia un piccolo server locale
        (<code>python3 -m http.server</code>).</div>`;
   });

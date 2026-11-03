@@ -30,6 +30,8 @@ Output: data/presenze.csv (una riga per ogni ospedale x codice, a ogni campionam
 from __future__ import annotations
 
 import csv
+import json
+import os
 import sys
 import time
 from datetime import datetime
@@ -50,6 +52,10 @@ TARGETS = [
 
 API = "https://api.prontosoccorso.live/api/{regione}/{provincia}"
 OUT = Path(__file__).parent / "data" / "presenze.csv"
+# Snapshot leggero per dashboard/bot: ultimo dato per ospedale + serie recente
+# di Prato. Evita di far scaricare al browser i 16+ MB del CSV storico.
+LATEST = Path(__file__).parent / "data" / "latest.json"
+SERIE_MAX = 1000  # punti recenti di Prato per il grafico (~10 giorni a 15 min)
 TZ = ZoneInfo("Europe/Rome")
 FIELDS = ["ts_scrape", "regione", "provincia", "ospedale",
           "codice", "in_attesa", "in_trattamento", "lat", "lng"]
@@ -180,6 +186,52 @@ def raccogli(regione: str, provincia: str, ts: str) -> list[dict]:
     return []
 
 
+def scrivi_latest(ts: str) -> None:
+    """Rigenera data/latest.json: ultimo dato per ogni ospedale + serie recente
+    di Prato (totali). Serve a dashboard e bot per un caricamento leggero,
+    senza scaricare i 16+ MB del CSV storico."""
+    if not OUT.exists():
+        return
+    per_osp: dict[str, dict] = {}
+    serie: list[dict] = []
+    with OUT.open(encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            osp = row.get("ospedale") or ""
+            if not osp:
+                continue
+            t = row["ts_scrape"]
+            o = per_osp.get(osp)
+            if o is None:
+                o = {"ospedale": osp, "provincia": row.get("provincia", ""),
+                     "lat": row.get("lat", ""), "lng": row.get("lng", ""),
+                     "ts": "", "codici": {}}
+                per_osp[osp] = o
+            if row.get("lat"):
+                o["lat"] = row["lat"]
+            if row.get("lng"):
+                o["lng"] = row["lng"]
+            if t > o["ts"]:
+                o["ts"] = t
+                o["codici"] = {}
+            if t == o["ts"]:
+                o["codici"][row["codice"]] = {
+                    "att": _num(row.get("in_attesa")),
+                    "trt": _num(row.get("in_trattamento")),
+                }
+            if "Prato" in osp and row["codice"] == "totali":
+                serie.append({"ts": t, "att": _num(row.get("in_attesa")),
+                              "trt": _num(row.get("in_trattamento"))})
+    data = {
+        "generato": ts,
+        "ospedali": list(per_osp.values()),
+        "prato_serie": serie[-SERIE_MAX:],
+    }
+    tmp = str(LATEST) + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False)
+    os.replace(tmp, str(LATEST))
+
+
 def main() -> int:
     ts = datetime.now(TZ).isoformat(timespec="seconds")
     all_rows: list[dict] = []
@@ -191,6 +243,7 @@ def main() -> int:
         print(f"[{ts}] nessun dato raccolto in questo giro (previsto: cache-miss)")
         return 0
     append(all_rows)
+    scrivi_latest(ts)
     osp = len({r["ospedale"] for r in all_rows})
     print(f"[{ts}] +{len(all_rows)} righe da {osp} ospedali")
     return 0

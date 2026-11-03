@@ -37,8 +37,8 @@ import requests
 TOKEN = os.environ.get("TG_BOT_TOKEN", "").strip()
 API = f"https://api.telegram.org/bot{TOKEN}"
 
-CSV_RAW = "https://raw.githubusercontent.com/iltempe/ps-prato/main/data/presenze.csv"
 DASHBOARD = "https://pspratolive.it/"
+LATEST_URL = DASHBOARD + "data/latest.json"   # snapshot leggero (pochi KB) invece del CSV intero
 
 CODICI = ["rosso", "giallo", "verde", "azzurro", "bianco"]
 EMOJI = {"rosso": "🔴", "giallo": "🟡", "verde": "🟢", "azzurro": "🔵", "bianco": "⚪"}
@@ -59,40 +59,39 @@ def _int(v):
         return 0
 
 
-def _fetch_rows():
-    r = requests.get(CSV_RAW, timeout=HTTP_TIMEOUT, headers={"Cache-Control": "no-cache"})
+def _fetch_latest():
+    r = requests.get(LATEST_URL, timeout=HTTP_TIMEOUT, headers={"Cache-Control": "no-cache"})
     r.raise_for_status()
-    return list(csv.DictReader(io.StringIO(r.text)))
+    return r.json()
 
 
 def snapshot():
     """(ts, {codice: {att, trt}}, fermo_da) dell'ultimo giro del PS di PRATO, o None.
 
-    fermo_da = timestamp piu' vecchio della serie finale con valori identici
-    all'ultimo (per rilevare la fonte "congelata").
+    Legge data/latest.json (leggero). fermo_da = timestamp piu' vecchio della
+    serie finale di Prato con valori identici all'ultimo (fonte "congelata").
     """
-    rows = [row for row in _fetch_rows() if "Prato" in (row.get("ospedale") or "")]
-    if not rows:
+    d = _fetch_latest()
+    ospedali = d.get("ospedali", [])
+    prato = next((o for o in ospedali if "Prato" in (o.get("ospedale") or "")), None)
+    if not prato:
         return None
-    groups = {}
-    for row in rows:
-        groups.setdefault(row["ts_scrape"], {})[row["codice"]] = (
-            _int(row.get("in_attesa")), _int(row.get("in_trattamento")))
-    stamps = sorted(groups)
-    last_ts = stamps[-1]
-    cur = {c: {"att": a, "trt": t} for c, (a, t) in groups[last_ts].items()}
+    cur = {c: {"att": _int(v.get("att")), "trt": _int(v.get("trt"))}
+           for c, v in (prato.get("codici") or {}).items()}
+    last_ts = prato.get("ts")
 
-    def sig(ts):
-        g = groups[ts]
-        return "|".join(f"{g.get(c, (0, 0))[0]}/{g.get(c, (0, 0))[1]}" for c in CODICI + ["totali"])
-
-    cur_sig = sig(last_ts)
+    serie = d.get("prato_serie", [])
     fermo_da = last_ts
-    for ts in reversed(stamps):
-        if sig(ts) == cur_sig:
-            fermo_da = ts
-        else:
-            break
+    if serie:
+        def sig(s):
+            return f"{_int(s.get('att'))}/{_int(s.get('trt'))}"
+        cur_sig = sig(serie[-1])
+        fermo_da = serie[-1].get("ts")
+        for s in reversed(serie):
+            if sig(s) == cur_sig:
+                fermo_da = s.get("ts")
+            else:
+                break
     return last_ts, cur, fermo_da
 
 
@@ -146,22 +145,15 @@ def build_message() -> str:
 
 def altri_summary():
     """Per ogni ospedale non-Prato: ultimo dato (presenti, in attesa, ts),
-    ordinato dal meno affollato. Serve a scegliere dove andare adesso."""
-    per_osp = {}
-    for row in _fetch_rows():
-        osp = row.get("ospedale") or ""
+    ordinato dal meno affollato. Legge data/latest.json (leggero)."""
+    out = []
+    for o in _fetch_latest().get("ospedali", []):
+        osp = o.get("ospedale") or ""
         if not osp or "Prato" in osp:
             continue
-        o = per_osp.setdefault(osp, {"ts": "", "codes": {}})
-        ts = row["ts_scrape"]
-        if ts > o["ts"]:
-            o["ts"], o["codes"] = ts, {}
-        if ts == o["ts"]:
-            o["codes"][row["codice"]] = (_int(row.get("in_attesa")), _int(row.get("in_trattamento")))
-    out = []
-    for osp, o in per_osp.items():
-        att, trt = o["codes"].get("totali", (0, 0))
-        out.append({"osp": osp, "att": att, "trt": trt, "presenti": att + trt, "ts": o["ts"]})
+        tot = (o.get("codici") or {}).get("totali") or {}
+        att, trt = _int(tot.get("att")), _int(tot.get("trt"))
+        out.append({"osp": osp, "att": att, "trt": trt, "presenti": att + trt, "ts": o.get("ts")})
     out.sort(key=lambda x: x["presenti"])
     return out
 
