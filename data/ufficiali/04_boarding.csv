@@ -1,0 +1,12 @@
+N. ACCESSI CON BOARDING,,,,,,,,,% ACCESSI CON BOARDING,,,,,,,
+Accessi per anno,ANNO_ACCETTAZIONE,,,,,,,,Accessi per anno,ANNO_ACCETTAZIONE,,,,,,
+,2019,2020,2021,2022,2023,2024,2025,,,2019,2020,2021,2022,2023,2024,2025
+n° accessi,-,-,10775,10029,7996,9219,9149,,n° accessi,-,-,15.0%,11.7%,8.8%,9.8%,9.4%
+TEMPO MEDIO ATTESA BOARDING,,,,,,,,,,,,,,,,
+Accessi per anno,ANNO_ACCETTAZIONE,,,,,,,,,,,,,,,
+,2019,2020,2021,2022,2023,2024,2025,,,,,,,,,
+n° accessi,-,-,14h 00m,20h 26m,14h 32m,10h 22m,13h 15m,,,,,,,,,
+Stato Selezione:,,,,,,,,,,,,,,,,
+STRUTTURA_CHIUSURA: Nuovo Ospedale di Prato Santo Stefano,,,,,,,,,,,,,,,,
+ESITO: NOT Inserito per errore,,,,,,,,,,,,,,,,
+N.B. Il tempo di permanenza è calcolato come ORA_CHIUSURA - ORA_DISPOSIZIONE,,,,,,,,,,,,,,,,

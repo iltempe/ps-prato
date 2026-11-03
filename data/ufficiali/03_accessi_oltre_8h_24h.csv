@@ -1,0 +1,22 @@
+N. ACCESSI CON PERMANENZA > 8H,,,,,,,,,% ACCESSI CON PERMANENZA > 8H,,,,,,,
+URGENZA_TRIAGE,ANNO_ACCETTAZIONE,,,,,,,,URGENZA_TRIAGE,ANNO_ACCETTAZIONE,,,,,,
+,2019,2020,2021,2022,2023,2024,2025,,,2019,2020,2021,2022,2023,2024,2025
+1. Emergenza,-,516,748,889,777,831,821,,1. Emergenza,-,38.4%,48.4%,52.6%,45.5%,44.1%,47.3%
+2. Urgenza Indifferibile,-,2469,3807,3851,3073,3633,4038,,2. Urgenza Indifferibile,-,44.3%,55.9%,55.4%,46.1%,50.2%,55.0%
+3. Urgenza Differibile,-,9945,13684,15834,15214,16258,16641,,3. Urgenza Differibile,-,29.9%,37.3%,35.2%,31.7%,34.1%,35.3%
+4. Urgenza Minore,-,1020,1533,1778,1456,1828,1763,,4. Urgenza Minore,-,6.3%,8.1%,7.1%,5.6%,6.9%,6.0%
+5. Non Urgenza,-,403,301,194,226,301,274,,5. Non Urgenza,-,4.7%,3.9%,2.9%,2.6%,2.8%,2.4%
+Totale,-,14353,20073,22546,20746,22851,23537,,Totale,-,22.1%,28.0%,26.4%,22.8%,24.2%,24.3%
+N. ACCESSI CON PERMANENZA > 24H,,,,,,,,,% ACCESSI CON PERMANENZA > 24H,,,,,,,
+URGENZA_TRIAGE,ANNO_ACCETTAZIONE,,,,,,,,URGENZA_TRIAGE,ANNO_ACCETTAZIONE,,,,,,
+,2019,2020,2021,2022,2023,2024,2025,,,2019,2020,2021,2022,2023,2024,2025
+1. Emergenza,-,218,307,459,431,334,377,,1. Emergenza,-,16.2%,19.9%,27.1%,25.2%,17.7%,21.7%
+2. Urgenza Indifferibile,-,1016,1595,1942,1703,1740,2047,,2. Urgenza Indifferibile,-,18.2%,23.4%,28.0%,25.5%,24.0%,27.9%
+3. Urgenza Differibile,-,3981,5364,7076,7415,7508,7704,,3. Urgenza Differibile,-,12.0%,14.6%,15.7%,15.5%,15.8%,16.3%
+4. Urgenza Minore,-,306,387,455,418,511,532,,4. Urgenza Minore,-,1.9%,2.0%,1.8%,1.6%,1.9%,1.8%
+5. Non Urgenza,-,222,112,43,60,95,74,,5. Non Urgenza,-,2.6%,1.5%,0.6%,0.7%,0.9%,0.7%
+Totale,-,5743,7765,9975,10027,10188,10734,,Totale,-,8.8%,10.8%,11.7%,11.0%,10.8%,11.1%
+Stato Selezione:,,,,,,,,,,,,,,,,
+STRUTTURA_CHIUSURA: Nuovo Ospedale di Prato Santo Stefano,,,,,,,,,,,,,,,,
+ESITO: NOT Inserito per errore,,,,,,,,,,,,,,,,
+N.B. Il tempo di permanenza è calcolato come ORA_CHIUSURA - ORA_ACCETTAZIONE,,,,,,,,,,,,,,,,
