@@ -1,7 +1,7 @@
 """Markdown essenziale -> pagina HTML (Guida e Metodo, in locale e sul sito)."""
 from __future__ import annotations
 
-def pagina_markdown(md: str, titolo: str, css: str = "style.css", indietro: str = "./") -> str:
+def pagina_markdown(md: str, titolo: str, radice: str = "../../", attivo: str | None = None) -> str:
     """Markdown essenziale -> HTML (titoli, paragrafi, elenchi, tabelle, grassetto, codice, link)."""
     import html as H
     import re
@@ -68,12 +68,25 @@ def pagina_markdown(md: str, titolo: str, css: str = "style.css", indietro: str 
                 par.append(righe[i])
             out.append("<p>" + inline(" ".join(par)) + "</p>")
         i += 1
+    r = radice
+    cur = lambda k: ' aria-current="page"' if k == attivo else ""  # noqa: E731
     return f"""<!DOCTYPE html><html lang="it"><head><meta charset="utf-8"><title>{titolo}</title>
-<meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="{css}">
-<style>body{{max-width:900px;margin:0 auto;padding:24px 28px 60px;background:var(--surface-1)}} h1{{font-size:24px}}
-h2{{font-size:19px;margin-top:32px;border-bottom:1px solid var(--grid);padding-bottom:4px}} h3{{font-size:16px;margin-top:22px}}
-p,li{{font-size:15px;line-height:1.6}} table{{margin:10px 0}} td,th{{text-align:left!important;vertical-align:top}}
-pre{{background:var(--surface-0);padding:10px;border-radius:6px;overflow-x:auto}}
-blockquote{{border-left:3px solid var(--accent);margin:12px 0;padding:4px 14px;color:var(--text-secondary)}}</style>
-</head><body class="viz-root"><p><a href="{indietro}">← torna al simulatore</a></p>{"".join(out)}</body></html>"""
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="{r}favicon.svg">
+<link rel="stylesheet" href="{r}assets/sito.css"></head>
+<body class="doc"><div class="wrap">
+<div class="sito-testata"><a class="brand" href="{r}">
+<svg class="brandmark" viewBox="0 0 64 64" role="img" aria-label="PS Prato Live"><rect x="2" y="2" width="60" height="60" rx="14" fill="#e11d2a"/><rect x="26.5" y="12" width="11" height="40" rx="3.5" fill="#fff"/><rect x="12" y="26.5" width="40" height="11" rx="3.5" fill="#fff"/></svg>
+<div><div class="brandname">PS Prato <span class="live">Live</span></div><div class="brandtag">Simulatore del Pronto Soccorso · gemello digitale</div></div></a></div>
+<nav class="sito-nav" aria-label="Sezioni del sito">
+<a href="{r}">Dashboard</a>
+<a class="evid" href="{r}gemello/ui/"{cur("simulatore")}>🔬 Simulatore</a>
+<a href="{r}gemello/ui/guida.html"{cur("guida")}>Istruzioni</a>
+<a href="{r}gemello/ui/metodo.html"{cur("metodo")}>Metodo</a>
+<a href="https://github.com/iltempe/ps-prato/tree/main/data/ufficiali" target="_blank" rel="noopener">Dati ufficiali ASL</a>
+</nav>
+{"".join(out)}
+<p class="credits"><a href="https://github.com/iltempe" target="_blank" rel="noopener">Matteo Tempestini · @iltempe</a>
+<a href="https://github.com/iltempe/ps-prato/tree/main/gemello" target="_blank" rel="noopener">Codice del modello</a>
+<a href="{r}privacy.html">Privacy</a></p>
+</div></body></html>"""

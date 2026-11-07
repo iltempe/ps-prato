@@ -405,6 +405,15 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=str(QUI / "ui"), **kw)
 
+    def translate_path(self, path):
+        """In locale: /assets/* e /favicon.svg dalla radice del repo, /gemello/ui/* = ui/*."""
+        p = path.split("?", 1)[0].split("#", 1)[0]
+        if p.startswith("/assets/") or p in ("/favicon.svg", "/privacy.html"):
+            return str(D.ROOT / p.lstrip("/"))
+        if p.startswith("/gemello/ui/"):
+            path = "/" + p[len("/gemello/ui/"):]
+        return super().translate_path(path)
+
     def log_message(self, fmt, *args):
         if "/api/job/" not in str(args[0] if args else ""):
             sys.stderr.write("%s\n" % (fmt % args))
@@ -433,7 +442,8 @@ class Handler(SimpleHTTPRequestHandler):
                                        crescita_totale=ST.crescita_totale()))
             if self.path in ("/guida", "/metodo", "/guida.html", "/metodo.html"):
                 nome = "GUIDA.md" if "guida" in self.path else "METODO.md"
-                html = pagina_markdown((QUI / nome).read_text(encoding="utf-8"), nome)
+                html = pagina_markdown((QUI / nome).read_text(encoding="utf-8"), nome,
+                                       attivo="guida" if "guida" in self.path else "metodo")
                 body = html.encode()
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")

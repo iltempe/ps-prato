@@ -74,7 +74,7 @@ def main(con_affidabilita=True):
     reports = sorted(p.stem for p in OUT.glob("report_*.md"))
     for r in reports:
         md = (OUT / f"{r}.md").read_text(encoding="utf-8")
-        (DATI / f"{r}.html").write_text(pagina_markdown(md, r, css="../style.css", indietro="../#investire"), encoding="utf-8")
+        (DATI / f"{r}.html").write_text(pagina_markdown(md, "Report · Simulatore PS Prato", radice="../../../"), encoding="utf-8")
     scrivi("config.json", dict(
         esportato=datetime.now().astimezone().isoformat(timespec="minutes"),
         config=cfg, leve=O.carica_leve(), fasce=["08-14", "14-20", "20-02", "02-08"],
@@ -94,9 +94,9 @@ def main(con_affidabilita=True):
                                 crescita_totale=ST.crescita_totale()))
 
     # pagine Istruzioni e Metodo
-    for md, html, tit in (("GUIDA.md", "guida.html", "Istruzioni · Simulatore PS Prato"),
-                          ("METODO.md", "metodo.html", "Metodo · Simulatore PS Prato")):
-        (UI / html).write_text(pagina_markdown((GEM / md).read_text(encoding="utf-8"), tit), encoding="utf-8")
+    for md, html, tit, att in (("GUIDA.md", "guida.html", "Istruzioni · Simulatore PS Prato", "guida"),
+                               ("METODO.md", "metodo.html", "Metodo · Simulatore PS Prato", "metodo")):
+        (UI / html).write_text(pagina_markdown((GEM / md).read_text(encoding="utf-8"), tit, attivo=att), encoding="utf-8")
 
     # libreria degli analoghi (scenario di riferimento) per la previsione pubblicata dalla Action
     g = cfg["gemello"]["analoghi"]

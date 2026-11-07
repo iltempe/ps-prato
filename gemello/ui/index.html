@@ -5,20 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Simulatore del Pronto Soccorso · PS Prato Live</title>
 <meta name="description" content="Gemello digitale del Pronto Soccorso Santo Stefano di Prato: previsione delle prossime ore e simulazioni su medici, letti, codici di triage. Tarato sui dati ufficiali ASL.">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="stylesheet" href="../../assets/sito.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="viz-root">
 <header class="top">
-  <div class="titolo">
-    <p class="solo-statico torna"><a href="../../">← PS Prato Live</a></p>
-    <h1>Gemello digitale del Pronto Soccorso · Santo Stefano di Prato</h1>
-    <p class="sotto">Modello calibrato sui dati ASL (accesso civico prot. 158918/2026) e agganciato alle presenze in tempo reale di <a href="https://pspratolive.it" target="_blank" rel="noopener">pspratolive.it</a></p>
+  <div class="sito-testata">
+    <a class="brand" href="../../" data-sito>
+      <svg class="brandmark" viewBox="0 0 64 64" role="img" aria-label="PS Prato Live">
+        <rect x="2" y="2" width="60" height="60" rx="14" fill="#e11d2a"/>
+        <rect x="26.5" y="12" width="11" height="40" rx="3.5" fill="#ffffff"/>
+        <rect x="12" y="26.5" width="40" height="11" rx="3.5" fill="#ffffff"/>
+      </svg>
+      <div>
+        <div class="brandname">PS Prato <span class="live">Live</span></div>
+        <div class="brandtag">Simulatore del Pronto Soccorso · gemello digitale</div>
+      </div>
+    </a>
+    <div class="stato-live" id="live">
+      <span class="punto" id="live-punto"></span>
+      <span id="live-testo">collegamento…</span>
+    </div>
   </div>
-  <nav class="link-doc"><a href="guida.html">Istruzioni</a> · <a href="metodo.html">Metodo</a></nav>
-  <div class="live" id="live">
-    <span class="punto" id="live-punto"></span>
-    <span id="live-testo">collegamento…</span>
-  </div>
+  <nav class="sito-nav" aria-label="Sezioni del sito">
+    <a href="../../" data-sito>Dashboard</a>
+    <a class="evid" href="./" aria-current="page">🔬 Simulatore</a>
+    <a href="guida.html">Istruzioni</a>
+    <a href="metodo.html">Metodo</a>
+    <a href="https://github.com/iltempe/ps-prato/tree/main/data/ufficiali" target="_blank" rel="noopener">Dati ufficiali ASL</a>
+  </nav>
+  <p class="sotto">Una copia simulata del Nuovo Ospedale S. Stefano, tarata sui dati ufficiali ASL (accesso civico prot. 158918/2026) e sulle presenze campionate ogni 15 minuti. Muovi i parametri a sinistra e guarda cosa cambierebbe.</p>
 </header>
 
 <div class="layout">
@@ -233,6 +250,14 @@
     </section>
   </main>
 </div>
+<footer class="piede">
+  <p class="credits">
+    <a href="https://github.com/iltempe" target="_blank" rel="noopener">Matteo Tempestini · @iltempe</a>
+    <a href="https://github.com/iltempe/ps-prato/tree/main/gemello" target="_blank" rel="noopener">Codice del modello</a>
+    <a href="metodo.html">Metodo e limiti</a>
+    <a href="../../privacy.html" data-sito>Privacy</a>
+  </p>
+</footer>
 <div class="tooltip" id="tooltip" role="status" aria-live="polite"></div>
 <script src="grafici.js"></script>
 <script src="statico.js"></script>

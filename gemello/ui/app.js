@@ -552,11 +552,14 @@ $("#btn-pdf").addEventListener("click", async e => {
     const cod = [1, 2, 3, 4, 5];
     const rc = (n, k, f, re) => `<tr><td>${n}</td>${cod.map(c => `<td>${re ? f(re[c]) + " · " : ""}${f(b[k][c])} · <b>${f(s[k][c])}</b></td>`).join("")}</tr>`;
     const html = `<!DOCTYPE html><html lang="it" data-theme="light"><head><meta charset="utf-8"><title>Simulazione PS Prato</title>
+      <link rel="stylesheet" href="${new URL("../../assets/sito.css", location.href)}">
       <link rel="stylesheet" href="${new URL("style.css", location.href)}">
       <style>body{background:#fff;padding:24px 32px;max-width:900px;margin:0 auto} h1{font-size:20px} h2{font-size:15px;margin:18px 0 6px}
       table{margin:6px 0 10px} td,th{padding:3px 6px;font-size:11.5px} .chart svg{width:100%} .meta{color:#555;font-size:12px}
       @page{size:A4;margin:14mm} @media print{.noprint{display:none}} .avv{font-size:11px;color:#555;border-top:1px solid #ddd;padding-top:8px;margin-top:16px}</style></head>
       <body class="viz-root"><p class="noprint"><button onclick="print()">Stampa / salva in PDF</button></p>
+      <div class="brand"><svg class="brandmark" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="14" fill="#e11d2a"/><rect x="26.5" y="12" width="11" height="40" rx="3.5" fill="#fff"/><rect x="12" y="26.5" width="40" height="11" rx="3.5" fill="#fff"/></svg>
+      <div><div class="brandname">PS Prato <span class="live">Live</span></div><div class="brandtag">Simulatore del Pronto Soccorso</div></div></div>
       <h1>Simulazione del Pronto Soccorso Santo Stefano di Prato</h1>
       <p class="meta">Generata il ${new Date().toLocaleString("it-IT")} con il gemello digitale di pspratolive.it · scenario calibrato ${P.turni}${P.rivalutazione_precedenza ? " (rivalutazione con precedenza)" : ""} · dati ASL ${CFG.asl.anno} (accesso civico prot. 158918/2026) e presenze ${new Date(CFG.presenze.inizio).toLocaleDateString("it-IT")}–${new Date(CFG.presenze.fine).toLocaleDateString("it-IT")}</p>
       <h2>Parametri modificati</h2>
@@ -596,6 +599,8 @@ $("#btn-pdf").addEventListener("click", async e => {
     await Statico.init();
     $("#p-orizzonte").querySelectorAll("option").forEach(o => { if (+o.value > 12) o.remove(); });
   }
+  if (!STATICO) document.querySelectorAll("[data-sito]").forEach(a =>
+    a.href = new URL(a.getAttribute("href"), "https://pspratolive.it/gemello/ui/").href);
   CFG = await API("/api/config");
   P = parametriDefault();
   $("#p-target").value = Math.round(CFG.config.target_riduzione * 100);

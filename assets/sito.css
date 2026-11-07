@@ -1,0 +1,82 @@
+/* PS Prato Live — stile comune a tutte le pagine del sito
+   (dashboard, simulatore, istruzioni, metodo, privacy, report).
+   Token e componenti ripresi dalla dashboard: cambiarli qui li cambia ovunque. */
+@import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600&family=Work+Sans:wght@400;500;600&display=swap");
+
+:root{
+  --bg:#f4f2ee; --card:#ffffff; --ink:#17181a; --muted:#6b6f76; --line:#e6e3dc; --hair:#efece6;
+  --rosso:#e11d2a; --giallo:#eab308; --verde:#2fa84f; --azzurro:#2f6fe0; --bianco:#9aa3ad;
+  --shadow:0 1px 2px rgba(20,18,14,.04), 0 2px 8px rgba(20,18,14,.05);
+  --sans:'Work Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --disp:'Big Shoulders Display',var(--sans);
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --raggio:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){ --bg:#111214; --card:#1a1c1f; --ink:#ececee; --muted:#9aa0a8; --line:#2a2d33; --hair:#23262b;
+    --azzurro:#4f8bf5; --shadow:0 1px 2px rgba(0,0,0,.3); }
+}
+
+/* ---------- testata comune ---------- */
+.sito-testata{display:flex;align-items:center;justify-content:space-between;gap:10px 22px;flex-wrap:wrap;margin:0 0 6px}
+.brand{display:flex;align-items:center;gap:14px;margin:0;text-decoration:none;color:inherit}
+.brandmark{width:46px;height:46px;flex:0 0 auto;border-radius:12px;box-shadow:var(--shadow)}
+.brandname{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.01em;margin:0;line-height:.95;text-transform:uppercase}
+.brandname .live{color:var(--rosso)}
+.brandtag{color:var(--ink);font-size:14px;font-weight:500;margin-top:4px;opacity:.85}
+
+/* ---------- menu comune ---------- */
+.sito-nav{display:flex;flex-wrap:wrap;gap:4px;margin:12px 0 18px;padding:4px;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);width:fit-content;max-width:100%}
+.sito-nav a{font:500 13.5px/1 var(--sans);color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:9px;white-space:nowrap}
+.sito-nav a:hover{color:var(--ink);background:var(--hair)}
+.sito-nav a[aria-current="page"]{background:var(--ink);color:var(--card)}
+.sito-nav a.evid{color:var(--rosso);font-weight:600}
+.sito-nav a.evid[aria-current="page"]{background:var(--rosso);color:#fff}
+
+/* ---------- pie' di pagina comune ---------- */
+.credits{color:var(--muted);font-size:13px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:6px 14px}
+.credits a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:1px}
+.credits a:hover{color:var(--ink);border-color:var(--rosso)}
+
+/* ---------- pagine di testo (istruzioni, metodo, report) ---------- */
+.doc{font:15px/1.65 var(--sans)}
+.doc .wrap{max-width:860px;margin:0 auto;padding:26px 18px 64px}
+.doc h1{font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.01em;font-size:32px;line-height:1.05;margin:22px 0 10px}
+.doc h2{font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:22px;margin:34px 0 8px;
+  padding-top:14px;border-top:1px solid var(--line)}
+.doc h3{font-weight:600;font-size:16px;margin:22px 0 6px}
+.doc p,.doc li{max-width:75ch}
+.doc a{color:var(--rosso)}
+.doc .brand{color:var(--ink)}
+.doc .sito-nav a{color:var(--muted)}
+.doc .sito-nav a.evid{color:var(--rosso)}
+.doc .sito-nav a[aria-current="page"]{color:var(--card)}
+.doc .sito-nav a.evid[aria-current="page"]{color:#fff}
+.doc .credits a{color:inherit}
+.doc hr{display:none}
+.doc blockquote{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--rosso);border-radius:12px;
+  margin:16px 0;padding:12px 16px;color:var(--ink);box-shadow:var(--shadow)}
+.doc pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow-x:auto;font:13px/1.5 var(--mono)}
+.doc code{font-family:var(--mono);font-size:.9em;background:rgba(127,127,127,.13);padding:1px 5px;border-radius:5px}
+.doc pre code{background:none;padding:0}
+.doc table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;margin:12px 0;box-shadow:var(--shadow)}
+.doc th,.doc td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--hair)}
+.doc thead th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;background:var(--bg)}
+.doc tr:last-child td{border-bottom:0}
+
+/* ---------- pulsanti ---------- */
+.btn,.btn-sec{appearance:none;font:500 13px/1 var(--sans);border-radius:10px;padding:9px 14px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.btn{background:var(--rosso);color:#fff;border:1px solid var(--rosso);font-weight:600}
+.btn-sec{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn-sec:hover{border-color:var(--rosso)}
+.btn:disabled,.btn-sec:disabled{opacity:.5;cursor:wait}
+
+@media (max-width:600px){
+  .brandname{font-size:26px}
+  .sito-nav{width:100%}
+  .sito-nav a{padding:8px 9px;font-size:13px}
+}
