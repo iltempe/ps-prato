@@ -165,11 +165,14 @@ async function aggiornaStato() {
     STATO = await API("/api/stato");
     const u = STATO.ultimo, ts = new Date(u.ts);
     const eta = Math.round((Date.now() - ts) / 60000);
-    const ok = !STATO.live_errore && u.fonte.startsWith("http");
-    $("#live-punto").className = "punto " + (ok && eta < 45 ? "ok" : "ko");
-    $("#live-testo").textContent = (ok ? "Live pspratolive.it" : "Dati locali") + " · rilevazione " +
-      ts.toLocaleString("it-IT", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) +
-      ` (${eta < 120 ? eta + " min fa" : Math.round(eta / 60) + " h fa"})` + (STATO.live_errore ? " · live non raggiungibile" : "");
+    const quando = ts.toLocaleString("it-IT", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+    const durata = eta < 120 ? eta + " min" : (eta / 60).toLocaleString("it-IT", { maximumFractionDigits: 1 }) + " ore";
+    const fresco = eta < 45 && !STATO.live_errore;
+    $("#live-punto").className = "punto " + (fresco ? "ok" : "ko");
+    $("#live-testo").textContent = fresco
+      ? `Dati in tempo reale · rilevazione ${quando} (${durata} fa)`
+      : `Dati fermi: ultima rilevazione ${quando}, nessun dato nuovo da ${durata} (la fonte ASL non risponde). Previsione calcolata da quel momento.`;
+    $("#live").title = fresco ? "" : "Il campionamento riprova ogni 15 minuti e riprende da solo quando la fonte torna disponibile.";
     if (u.ts !== ULTIMO_TS) { ULTIMO_TS = u.ts; aggiornaPrevisione(); }
     disegnaStato();
   } catch (e) { $("#live-testo").textContent = "server non raggiungibile: " + e.message; $("#live-punto").className = "punto ko"; }

@@ -142,7 +142,7 @@ body { font: 14.5px/1.5 var(--sans); background: var(--bg); color: var(--ink); -
 .top { display: block; padding: 22px 24px 0; background: var(--bg); border-bottom: none; }
 .top .sotto { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; max-width: 90ch; }
 .top .sito-nav { margin: 12px 0 10px; }
-.stato-live { font-family: var(--mono); font-size: 12px; }
+.stato-live { font-family: var(--mono); font-size: 12px; white-space: normal; max-width: 520px; text-align: right; }
 .layout { border-top: 1px solid var(--line); min-height: auto; }
 .parametri { max-height: calc(100vh - 20px); top: 10px; }
 main { padding: 16px 24px 30px; }

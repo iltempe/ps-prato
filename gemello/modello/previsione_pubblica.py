@@ -69,6 +69,15 @@ def main():
     if stato is None:
         ts = list(serie)[-1]
         stato = dict(ts=ts, **serie[ts])
+    dest = GEM / "ui" / "dati" / "previsione.json"
+    if dest.exists() and "--forza" not in sys.argv:
+        try:
+            vecchio = json.loads(dest.read_text())
+            if vecchio["ultimo"]["ts"] == stato["ts"] and vecchio.get("scenario") == var:
+                print(f"nessun dato nuovo dopo {stato['ts']}: previsione invariata")
+                return
+        except Exception:
+            pass
     t0 = datetime.fromisoformat(stato["ts"])
     corr = (AN.profilo_reale(serie), (z["profilo_presenti"], z["profilo_attesa"]))
     p = AN.prevedi_analoghi(lib, stato, t0.hour + t0.minute / 60, c["orizzonte"], k=c["k"], tau=c["tau"],
@@ -93,7 +102,6 @@ def main():
             prob_oltre={k: [round(float(x), 3) for x in v] for k, v in p["prob_oltre"].items()},
         ),
     )
-    dest = GEM / "ui" / "dati" / "previsione.json"
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps(out, separators=(",", ":")))
     print(f"previsione da {stato['ts']}: presenti {sum(stato['attesa'].values()) + sum(stato['tratt'].values())}"
