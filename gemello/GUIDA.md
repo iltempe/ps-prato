@@ -87,7 +87,10 @@ letti, ecc.). Ogni volta che ne cambi uno, il gemello ricalcola tutto da solo in
 Il pulsante **Ripristina** riporta tutto ai valori di partenza, cioè alla situazione reale.
 
 **Al centro** ci sono le schede: *Adesso*, *Regime annuo*, *Su cosa investire*,
-*Storico ASL*, *Affidabilità*, e poi *Istruzioni* (questa guida) e *Metodo*.
+*Storico ASL*, *Affidabilità*.
+
+**Sotto il menu del sito** ci sono tre sotto-link: *Simulazioni* (le schede qui sopra),
+*Istruzioni* (questa guida) e *Metodo* (come è costruito e verificato il modello).
 
 **In alto a destra** ci sono due pulsanti per salvare la simulazione:
 
@@ -98,7 +101,7 @@ Il pulsante **Ripristina** riporta tutto ai valori di partenza, cioè alla situa
   regime annuo, base e con i parametri, per codice), utile per rielaborarli o per allegarli a
   un articolo.
 
-**Istruzioni** (questa guida) e **Metodo** sono due schede del simulatore, accanto alle altre.
+*Istruzioni* e *Metodo* si aprono dai sotto-link in alto.
 
 ### Come leggere i grafici
 

@@ -122,8 +122,16 @@ function cambiato() {
 }
 
 /* ------------------------------------------------------------------ schede */
-const tabAttiva = () => document.querySelector(".schede .attiva").dataset.tab;
+let SCHEDA = "adesso";
+const tabAttiva = () => SCHEDA;
 function vaiA(tab) {
+  SCHEDA = tab;
+  const testo = tab === "istruzioni" || tab === "metodo";
+  document.body.classList.toggle("lettura", testo);
+  document.querySelectorAll(".sotto-nav a").forEach(a => {
+    const on = a.dataset.sotto === (testo ? tab : "strumenti");
+    on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current");
+  });
   document.querySelectorAll(".schede button").forEach(b => b.classList.toggle("attiva", b.dataset.tab === tab));
   document.querySelectorAll(".scheda").forEach(s => s.classList.toggle("attiva", s.id === "tab-" + tab));
   if (tab === "regime" && REGIME_STALE) aggiornaRegime();
@@ -635,6 +643,6 @@ $("#btn-pdf").addEventListener("click", async e => {
   window.addEventListener("resize", () => { if (ULTIMA_PREV) disegnaPrevisione(ULTIMA_PREV); });
   if (STATICO) mostraPubblicati();
   const h = location.hash.slice(1);
-  if (["regime", "investire", "storico", "affidabilita", "istruzioni", "metodo"].includes(h)) vaiA(h);
+  vaiA(["regime", "investire", "storico", "affidabilita", "istruzioni", "metodo"].includes(h) ? h : "adesso");
   window.addEventListener("hashchange", () => { const t = location.hash.slice(1); if (document.getElementById("tab-" + t)) vaiA(t); });
 })();

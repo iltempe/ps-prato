@@ -171,3 +171,10 @@ main a, .parametri a { color: var(--rosso); }
 .doc-contenuto.card { padding: 6px 30px 26px; max-width: 980px; }
 .doc-contenuto td, .doc-contenuto th { font-family: var(--sans); font-size: 14px; text-align: left; }
 .doc-contenuto h1:first-child { margin-top: 18px; }
+
+/* sotto-menu del simulatore: Simulazioni · Istruzioni · Metodo */
+.sotto-nav { display: flex; gap: 18px; margin: -2px 0 12px 4px; font-size: 13.5px; }
+.sotto-nav a { color: var(--muted); text-decoration: none; padding: 3px 0; border-bottom: 2px solid transparent; }
+.sotto-nav a:hover { color: var(--ink); }
+.sotto-nav a[aria-current="page"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--rosso); }
+body.lettura .schede, body.lettura .azioni { display: none; }
