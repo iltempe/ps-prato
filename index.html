@@ -148,6 +148,9 @@
   @media (prefers-color-scheme: dark){.err{background:#3a1d1d;color:#f3c6c6;border-color:#5a2a2a}}
   .warn{background:#fbf0cf;color:#7a5b00;border:1px solid #ecd899;border-radius:12px;padding:12px 15px;font-size:13.5px;margin:0 0 16px}
   @media (prefers-color-scheme: dark){.warn{background:#302912;color:#f0dca0;border-color:#4d431f}}
+  .simulatore{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);transition:border-color .15s}
+  .simulatore:hover{border-color:#e11d2a}
+  .sim-cta{display:inline-block;margin-top:6px;font-weight:600;color:#e11d2a}
 </style>
 </head>
 <body>
@@ -230,6 +233,12 @@
     <div class="fonte">Fonte: ARS Toscana, indicatore 1657 — accessi in Pronto Soccorso per residenza</div>
   </div>
 
+  <a class="big simulatore" href="gemello/ui/">
+    <h2 class="title">Simulatore: e se…? 🔬</h2>
+    <p class="cap" style="margin:-6px 0 6px">Il <b>gemello digitale</b> del Pronto Soccorso: una copia simulata del Santo Stefano, tarata sui dati ufficiali ASL e sulle presenze di questo sito. Guarda la previsione delle prossime ore e prova tu: un medico in più la sera, più letti in reparto, meno codici bianchi… cosa cambierebbe nei tempi d'attesa?</p>
+    <span class="sim-cta">Apri il simulatore →</span>
+  </a>
+
   <div class="big">
     <h2 class="title">Altri PS della Toscana — adesso</h2>
     <p class="cap" style="margin:-6px 0 14px">Ordinati dal meno affollato in questo momento. Utile per orientarsi: meno persone presenti spesso vuol dire meno attesa. (Prato è qui sopra, in primo piano.)</p>
@@ -248,6 +257,7 @@
     <a href="https://github.com/iltempe/ps-prato" target="_blank" rel="noopener">Repository</a>
     <a href="https://github.com/iltempe/ps-prato/blob/main/data/presenze.csv" target="_blank" rel="noopener">Dataset (CSV)</a>
     <a href="https://github.com/iltempe/ps-prato/tree/main/data/ufficiali" target="_blank" rel="noopener">📄 Dati ufficiali ASL</a>
+    <a href="gemello/ui/">🔬 Simulatore</a>
     <a href="https://t.me/ps_prato_live_bot" target="_blank" rel="noopener">💬 Bot Telegram</a>
     <a href="https://buymeacoffee.com/iltempe" target="_blank" rel="noopener">☕ Offrimi un caffè</a>
     <a href="privacy.html">Privacy</a>

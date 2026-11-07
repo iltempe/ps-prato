@@ -1,0 +1,108 @@
+# Parametri del modello PS Santo Stefano.
+# Tutto ciò che NON viene dai dati è un'ipotesi: è qui per essere cambiato.
+
+anno_asl: 2025
+
+# Obiettivo: riduzione percentuale della metrica scelta
+target_riduzione: 0.30
+# permanenza (media ore in PS) | attesa (prima visita) | presenti (ore-paziente, affollamento)
+# | permanenza_c3, attesa_c4, ... (un solo codice). Attenzione: con leve che tolgono pazienti
+# brevi (CAU) la permanenza MEDIA può salire anche se il PS è meno affollato: usare "presenti".
+metrica_target: permanenza
+
+simulazione:
+  giorni: 182          # durata misurata
+  warmup_giorni: 21    # scartati (sistema che si riempie)
+  seed: 42
+  processi: 8          # simulazioni in parallelo
+  repliche: 6          # semi diversi per scenario (media): riduce il rumore
+
+# Medici in servizio per fascia (escluso medico OBI, che non vede i nuovi accessi).
+# Il file ASL 06_risorse dice: mattino 8+1 OBI, pomeriggio 7+1 OBI,
+# "nottina (20-02)" 1, notturno 3. Due letture possibili:
+#   A) notturno = 3 medici 20-08, la nottina è un medico IN PIÙ 20-02 -> 4 medici 20-02
+#   B) nella fascia 20-02 c'è un solo medico (lettura dell'articolo)
+# Il modello le calibra entrambe e dice quale riproduce le attese misurate.
+turni_medici:
+  scenario: A
+  A: {"08-14": 8, "14-20": 7, "20-02": 4, "02-08": 3}
+  B: {"08-14": 8, "14-20": 7, "20-02": 1, "02-08": 3}
+
+# Minuti di lavoro medico per contatto (prima visita, rivalutazione/dimissione).
+# Valori iniziali: in calibrazione vengono moltiplicati per un unico fattore
+# scelto in modo da riprodurre il numero medio di persone in attesa misurato.
+tempo_medico_min:
+  visita:        {1: 40, 2: 30, 3: 20, 4: 12, 5: 10}
+  rivalutazione: {1: 20, 2: 15, 3: 10, 4: 5, 5: 3}
+
+# Ordine di presa in carico: ogni paziente ha una scadenza "da vedere entro" = arrivo + margine
+# per codice; il medico prende chi ha la scadenza più vicina (il codice 1 passa sempre davanti).
+# I margini NON sono un'ipotesi: vengono calcolati dalle attese misurate per codice
+# (Little sulle persone in attesa: codice 2 ~30 min, 5 ~30 min, 4 ~1h15, 3 ~2h).
+
+# Rivalutazione/dimissione: chi ha finito gli esami aspetta il medico come un nuovo arrivo
+# (false) o passa davanti (true)? Non misurabile dai dati: è il parametro più incerto per
+# stimare l'effetto dei medici in più. ottimizza.py --variante permette il confronto.
+# Con il modello a due percorsi la variante "precedenza" è l'unica che riproduce insieme
+# permanenza, quota >8h e quota >24h per codice (dati ASL 2025): è quella di riferimento.
+rivalutazione_precedenza: true
+
+# Probabilità relativa di ricovero per codice (riscalata per ottenere i boarding ASL)
+quota_ricovero: {1: 0.50, 2: 0.40, 3: 0.10, 4: 0.01, 5: 0.0}
+
+# Pazienza media (ore) prima di abbandonare in attesa della visita; i codici 1-2 non abbandonano.
+# Riscalata in calibrazione per ottenere il tasso di abbandono ASL.
+pazienza_ore: {3: 6.0, 4: 4.0, 5: 3.0}
+
+# Lisciatura della stima degli arrivi orari dalle presenze (più alto = profilo più piatto).
+# Con valori bassi la deconvoluzione dà arrivi notturni ~0, poco plausibili.
+liscio_arrivi: 6
+
+# Letti di reparto che ricevono dal PS. Il PS è solo una parte dei loro ricoveri:
+# quota_ps = ricoveri da PS / ricoveri totali di quei reparti (ipotesi; gli altri restano costanti).
+# La capacità viene ricavata dall'attesa di boarding ASL (13h15 = 1/margine).
+letti:
+  quota_ps: 0.6
+
+# Crescita annua degli accessi per le proiezioni.
+#   auto  = tasso medio PER CODICE nel periodo indicato (dati ASL storici)
+#   0.04  = uguale per tutti i codici;  {1: 0.01, ..., 5: 0.15} = per codice
+crescita_accessi: auto
+crescita_periodo: [2022, 2025]
+anni_proiezione: 5
+
+# Costi: anni su cui ammortizzare gli investimenti una tantum
+ammortamento_anni: 10
+
+# --------------------------------------------------------------------------- #
+# Gemello digitale e interfaccia (python app.py)
+# --------------------------------------------------------------------------- #
+gemello:
+  url_live: https://pspratolive.it/data/latest.json
+  aggiorna_live_minuti: 5        # ogni quanto il server rilegge il dato live
+  orizzonte_ore: 12              # quanto avanti prevedere
+  percentili: [10, 50, 90]       # forchetta mostrata
+  soglia_affollamento: 83        # postazioni: oltre = sovraffollato
+  metodo: analoghi               # analoghi (default, validato) | iniezione
+  analoghi:
+    giorni: 180                  # lunghezza della simulazione-libreria per scenario
+    repliche: 8
+    k: 60                        # stati simili usati
+    tau: 24                      # ore: quanto dura la correzione di livello osservato-simulato
+    finestra_ore: 1.0            # stessa ora del giorno ± finestra
+    correzione_profilo: true     # corregge la forma oraria del modello con quella reale
+    allarga: 1.8                 # allargamento forchetta (backtest: con 1,6 copriva il 71-77%)
+  regime:
+    giorni: 120                  # simulazione "a regime" per gli indicatori annui
+    repliche: 4
+  web:                           # versione online (simulazioni nel browser, motore JavaScript)
+    giorni: 182                  # regime annuo: giorni simulati
+    repliche: 4
+    ottimizza_giorni: 120        # ricerca del mix (più corta: deve stare in ~1 minuto)
+    ottimizza_repliche: 3
+    lib_giorni: 120              # libreria di analoghi per le previsioni "e se"
+    lib_repliche: 6
+  backtest:
+    giorni: 30
+    ogni_ore: 3
+  porta: 8765

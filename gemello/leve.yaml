@@ -1,0 +1,89 @@
+# Leve d'investimento. Ogni leva dice COME cambia il pronto soccorso simulato e QUANTO costa.
+# L'effetto sui tempi NON è scritto qui: lo calcola la simulazione.
+# Fanno eccezione le leve di tipo "processo" e "fast_track", dove la quota di
+# riduzione dei tempi di esame/consulenza è un'ipotesi (non c'è dato ASL che la misuri).
+#
+# COSTI INDICATIVI, DA VERIFICARE con dati aziendali/regionali. Riferimenti usati:
+#  - dirigente medico ~110.000 €/anno lordo azienda, ~1.450 h cliniche/anno
+#      -> coprire una fascia di 6h tutti i giorni (2.190 h) ≈ 1,5 FTE ≈ 165.000 €/anno
+#  - infermiere ~48.000 €/anno lordo azienda
+#  - giornata di degenza in area medica ~600 €
+#
+# tipi:
+#   medici       -> aggiunge medici in una o più fasce orarie
+#   fast_track   -> percorso dedicato (medico+infermiere) per alcuni codici in una fascia
+#   letti        -> più letti in reparto = più posti liberi al giorno per i pazienti in boarding
+#   dimissioni   -> stessi letti, degenza media più corta (dimissioni al mattino e nel weekend)
+#   processo     -> riduce i tempi di esami/consulenze/esiti per alcuni codici (ipotesi)
+#   deflessione  -> una quota di accessi viene gestita fuori dal PS (CAU, case di comunità)
+
+leve:
+  - id: medico_20_02
+    nome: "+1 medico fascia 20-02"
+    tipo: medici
+    fasce: {"20-02": 1}
+    costo_annuo: 165000
+    max_unita: 2
+
+  - id: medico_14_20
+    nome: "+1 medico fascia 14-20"
+    tipo: medici
+    fasce: {"14-20": 1}
+    costo_annuo: 165000
+    max_unita: 2
+
+  - id: medico_08_14
+    nome: "+1 medico fascia 08-14"
+    tipo: medici
+    fasce: {"08-14": 1}
+    costo_annuo: 165000
+    max_unita: 1
+
+  - id: medico_02_08
+    nome: "+1 medico fascia 02-08"
+    tipo: medici
+    fasce: {"02-08": 1}
+    costo_annuo: 165000
+    max_unita: 1
+
+  - id: fast_track
+    nome: "Fast track codici 4-5 (medico + infermiere, 8-20)"
+    tipo: fast_track
+    codici: [4, 5]
+    fasce: {"08-20": 1}
+    riduzione_processo: 0.25    # ipotesi: percorso snello riduce del 25% i tempi dopo la visita
+    costo_annuo: 475000         # 3 FTE medico + 3 FTE infermiere
+
+  - id: letti_10
+    nome: "+10 letti di area medica"
+    tipo: letti
+    letti: 10
+    degenza_media_giorni: 8     # -> 10/8 = 1,25 posti liberi in più al giorno
+    costo_annuo: 2190000        # 10 × 365 × 600 €
+    max_unita: 3
+
+  - id: bed_management
+    nome: "Bed manager + discharge room (dimissioni entro le 11, anche nel weekend)"
+    tipo: dimissioni
+    riduzione_degenza: 0.03     # ipotesi: degenza media in reparto -3% (dimissioni al mattino e nel weekend)
+    costo_annuo: 250000
+
+  - id: diagnostica
+    nome: "Diagnostica dedicata al PS H24 (TAC + refertazione)"
+    tipo: processo
+    codici: [1, 2, 3]
+    riduzione: 0.10             # ipotesi: -10% sui tempi tra visita e decisione
+    costo_annuo: 600000
+
+  - id: consulenze
+    nome: "Protocolli consulenze specialistiche con tempi garantiti"
+    tipo: processo
+    codici: [2, 3]
+    riduzione: 0.05             # ipotesi
+    costo_annuo: 120000
+
+  - id: cau
+    nome: "CAU / casa di comunità per codici minori"
+    tipo: deflessione
+    quota: {5: 0.40, 4: 0.15}   # ipotesi: quota di accessi assorbita fuori dal PS
+    costo_annuo: 900000

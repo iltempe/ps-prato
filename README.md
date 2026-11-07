@@ -96,3 +96,15 @@ trattamento, ora per ora). Ottimo per mostrare picchi e saturazione nel tempo;
 non contiene tempi di permanenza né boarding, che vanno chiesti all'USL (EMUR).
 
 Licenza codice: MIT.
+
+## Simulatore / gemello digitale (`gemello/`)
+
+Una copia simulata del Pronto Soccorso Santo Stefano, tarata sui dati ufficiali ASL
+(`data/ufficiali/`, accesso civico prot. 158918/2026) e sulle presenze di questo dataset.
+Online su **https://pspratolive.it/gemello/**: previsione delle prossime ore (aggiornata dalla
+GitHub Action a ogni campione) e simulazioni "e se" che girano nel browser, con esportazione
+in PDF e JSON.
+
+- Istruzioni per l'uso: [`gemello/GUIDA.md`](gemello/GUIDA.md)
+- Metodo, calibrazione, validazione e limiti: [`gemello/METODO.md`](gemello/METODO.md)
+- Versione locale completa (calibrazione, ottimizzazione lunga, backtest): [`gemello/README.md`](gemello/README.md)

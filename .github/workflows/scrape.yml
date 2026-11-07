@@ -50,7 +50,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: pip install -r requirements.txt
+      - run: pip install -r requirements.txt numpy
 
       - name: Loop di campionamento
         run: |
@@ -63,7 +63,9 @@ jobs:
           FINE=$(( $(date +%s) + DURATA_MIN*60 ))
           while : ; do
             python scraper.py || true
-            git add data/
+            # previsione delle prossime ore per il simulatore (pspratolive.it/gemello/)
+            python gemello/modello/previsione_pubblica.py || true
+            git add data/ gemello/ui/dati/previsione.json
             if ! git diff --staged --quiet ; then
               git commit -q -m "dati: $(date -u +%FT%TZ)"
               if ! git push -q ; then
@@ -72,7 +74,8 @@ jobs:
                 git fetch -q origin main
                 git reset -q --hard origin/main
                 python scraper.py || true
-                git add data/
+                python gemello/modello/previsione_pubblica.py || true
+                git add data/ gemello/ui/dati/previsione.json
                 git diff --staged --quiet || { git commit -q -m "dati: $(date -u +%FT%TZ)"; git push -q || true; }
               fi
             fi

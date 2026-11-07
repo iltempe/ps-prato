@@ -11,3 +11,11 @@ analisi/
 
 # stato del bot Telegram (iscritti): mai nel repo, vive nella cache Actions
 state/
+
+# gemello digitale: ambiente e file di lavoro locali
+gemello/.venv/
+gemello/output/*.log
+gemello/output/jobs.txt
+gemello/output/live_storico.json
+gemello/output/precedente/
+pspratolive.code-workspace

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulatore del Pronto Soccorso · PS Prato Live</title>
+<meta name="description" content="Gemello digitale del Pronto Soccorso Santo Stefano di Prato: previsione delle prossime ore e simulazioni su medici, letti, codici di triage. Tarato sui dati ufficiali ASL.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="viz-root">
+<header class="top">
+  <div class="titolo">
+    <p class="solo-statico torna"><a href="../../">← PS Prato Live</a></p>
+    <h1>Gemello digitale del Pronto Soccorso · Santo Stefano di Prato</h1>
+    <p class="sotto">Modello calibrato sui dati ASL (accesso civico prot. 158918/2026) e agganciato alle presenze in tempo reale di <a href="https://pspratolive.it" target="_blank" rel="noopener">pspratolive.it</a></p>
+  </div>
+  <nav class="link-doc"><a href="guida.html">Istruzioni</a> · <a href="metodo.html">Metodo</a></nav>
+  <div class="live" id="live">
+    <span class="punto" id="live-punto"></span>
+    <span id="live-testo">collegamento…</span>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- ===================== PARAMETRI ===================== -->
+  <aside class="parametri" id="parametri">
+    <div class="par-testa">
+      <h2>Parametri</h2>
+      <button class="btn-sec" id="reset" title="Torna ai valori calibrati">Ripristina</button>
+    </div>
+    <p class="nota">Ogni modifica ricalcola la previsione e gli indicatori annui. Il caso base resta in grigio per il confronto.</p>
+
+    <details open>
+      <summary>Modello di base</summary>
+      <label class="riga">Turni medici
+        <select id="p-turni">
+          <option value="A">A · 4 medici 20-02 (3 notturni + nottina)</option>
+          <option value="B">B · 1 medico 20-02</option>
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" id="p-rivprec"> La rivalutazione passa davanti ai nuovi arrivi</label>
+      <p class="nota" id="nota-scenari"></p>
+    </details>
+
+    <details open>
+      <summary>Medici in servizio</summary>
+      <div id="p-medici"></div>
+      <div id="r-tempo_medico"></div>
+    </details>
+
+    <details open>
+      <summary>Domanda</summary>
+      <div id="r-carico"></div>
+      <div id="r-anni_avanti"></div>
+      <div id="r-pazienza"></div>
+    </details>
+
+    <details open>
+      <summary>Per codice di triage</summary>
+      <p class="nota">Scegli il codice e regola i suoi parametri. Un pallino segnala i codici modificati.</p>
+      <div class="sel-codice" id="p-sel-codice"></div>
+      <div id="p-codice"></div>
+    </details>
+
+    <details open>
+      <summary>Letti a valle (boarding)</summary>
+      <div id="r-letti_extra"></div>
+      <div id="r-riduzione_degenza"></div>
+      <label class="check"><input type="checkbox" id="p-letti_seguono"> I letti crescono con i ricoveri (negli anni)</label>
+    </details>
+
+    <details>
+      <summary>Leve d'investimento (leve.yaml)</summary>
+      <div id="p-leve"></div>
+    </details>
+
+    <div class="costo" id="costo"></div>
+  </aside>
+
+  <!-- ===================== CONTENUTO ===================== -->
+  <main>
+    <div class="azioni">
+      <button class="btn-sec" id="btn-pdf" title="Rapporto stampabile della simulazione: parametri, risultati, grafici">Esporta PDF</button>
+      <button class="btn-sec" id="btn-json" title="Parametri e risultati completi in formato JSON">Esporta JSON</button>
+    </div>
+    <nav class="schede" role="tablist">
+      <button role="tab" data-tab="adesso" class="attiva">Adesso</button>
+      <button role="tab" data-tab="regime">Regime annuo</button>
+      <button role="tab" data-tab="investire">Su cosa investire</button>
+      <button role="tab" data-tab="storico">Storico ASL</button>
+      <button role="tab" data-tab="affidabilita">Affidabilità</button>
+    </nav>
+
+    <!-- ADESSO -->
+    <section id="tab-adesso" class="scheda attiva">
+      <div class="tiles" id="tiles-adesso"></div>
+      <div class="card">
+        <div class="card-testa">
+          <h3>Persone presenti in PS: ultime 24 ore e prossime <span id="oriz-lbl">12</span> ore</h3>
+          <label class="riga-inline">Orizzonte
+            <select id="p-orizzonte"><option>6</option><option selected>12</option><option>24</option></select> ore
+          </label>
+        </div>
+        <div class="legenda" id="leg-presenti"></div>
+        <div class="chart" id="ch-presenti"></div>
+        <p class="nota">Fascia: 80% delle traiettorie simulate (percentili 10-90). Metodo degli analoghi con correzione del profilo orario reale; affidabilità misurata nella scheda <a href="#" data-goto="affidabilita">Affidabilità</a>.</p>
+      </div>
+      <div class="griglia2">
+        <div class="card">
+          <h3>Persone in attesa della prima visita</h3>
+          <div class="legenda" id="leg-attesa"></div>
+          <div class="chart" id="ch-attesa"></div>
+        </div>
+        <div class="card">
+          <h3>Probabilità di essere oltre le 83 postazioni</h3>
+          <div class="legenda" id="leg-prob"></div>
+          <div class="chart" id="ch-prob"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-testa">
+          <h3>Per codice di triage: presenti e in attesa, ultime 24 ore e previsione</h3>
+          <div class="sel-codice" id="sel-cod-adesso"></div>
+        </div>
+        <div class="griglia2 interna">
+          <div><div class="legenda" id="leg-cod-pres"></div><div class="chart" id="ch-cod-pres"></div></div>
+          <div><div class="legenda" id="leg-cod-att"></div><div class="chart" id="ch-cod-att"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Stato attuale per codice</h3>
+        <div id="tab-stato"></div>
+      </div>
+    </section>
+
+    <!-- REGIME -->
+    <section id="tab-regime" class="scheda">
+      <p class="intro">Come funzionerebbe il PS <b>in media su un anno</b> con i parametri scelti (simulazione a regime), confrontato con il caso base calibrato e con i dati reali.</p>
+      <div class="tiles" id="tiles-regime"></div>
+      <div class="griglia2">
+        <div class="card">
+          <h3>Presenti medi per ora del giorno</h3>
+          <div class="legenda" id="leg-ora"></div>
+          <div class="chart" id="ch-ora"></div>
+        </div>
+        <div class="card">
+          <div class="card-testa">
+            <h3>Per codice di triage</h3>
+            <select id="sel-metrica-cod">
+              <option value="permanenza_codice">Permanenza media (ore)</option>
+              <option value="attesa_visita_codice">Attesa prima visita (ore)</option>
+              <option value="p24_codice">Quota oltre 24 ore</option>
+              <option value="p8_codice">Quota oltre 8 ore</option>
+              <option value="presenti_codice">Presenti medi</option>
+            </select>
+          </div>
+          <div class="legenda" id="leg-codici"></div>
+          <div class="chart" id="ch-codici"></div>
+        </div>
+      </div>
+      <div class="card"><h3>Confronto per codice: reale · base · parametri scelti</h3><div id="tab-regime-cod"></div></div>
+      <div class="card"><h3>Dettaglio</h3><div id="tab-regime-det"></div></div>
+    </section>
+
+    <!-- INVESTIRE -->
+    <section id="tab-investire" class="scheda">
+      <div class="card">
+        <div class="card-testa">
+          <h3>Mix d'investimento minimo per ridurre i tempi</h3>
+        </div>
+        <div class="form-riga">
+          <label>Obiettivo di riduzione <input type="number" id="p-target" min="5" max="60" step="1" value="30"> %</label>
+          <label>Metrica
+            <select id="p-metrica"></select>
+          </label>
+          <button class="btn" id="btn-ottimizza">Calcola</button>
+        </div>
+        <p class="nota solo-statico">Il calcolo gira nel tuo browser (circa un minuto): simulazioni più corte di quelle della versione locale, quindi un po' più rumorose.</p>
+        <p class="nota" id="report-pubblicati"></p>
+        <p class="nota">Parte dallo scenario impostato nei parametri. A ogni passo la simulazione aggiunge la leva con il miglior rapporto riduzione/costo, dato ciò che è già stato scelto (le interazioni contano). Costi ed effetti in <code>leve.yaml</code>: indicativi, da verificare. Qualche minuto.</p>
+        <div class="progresso" id="prog-ottimizza"></div>
+        <div id="ris-ottimizza"></div>
+      </div>
+    </section>
+
+    <!-- STORICO -->
+    <section id="tab-storico" class="scheda">
+      <p class="intro">Dati ufficiali ASL 2020-2025. Il 2021 (pandemia) è marcato come anomalo e non è usato per stimare la crescita.</p>
+      <div class="griglia2">
+        <div class="card"><h3>Permanenza media per codice (ore)</h3><div class="legenda" id="leg-st-perm"></div><div class="chart" id="ch-st-perm"></div></div>
+        <div class="card"><h3>Accessi per codice</h3><div class="legenda" id="leg-st-acc"></div><div class="chart" id="ch-st-acc"></div></div>
+        <div class="card"><h3>Permanenza di ogni codice rispetto alla media (×)</h3><div class="legenda" id="leg-st-rap"></div><div class="chart" id="ch-st-rap"></div></div>
+        <div class="card"><h3>Quota di accessi oltre 24 ore</h3><div class="legenda" id="leg-st-24"></div><div class="chart" id="ch-st-24"></div></div>
+      </div>
+      <div class="card"><h3>Crescita media annua degli accessi 2022-2025 (usata nelle proiezioni)</h3><div id="tab-crescita"></div></div>
+      <div class="card"><h3>Tabella</h3><div id="tab-storico-det"></div></div>
+    </section>
+
+    <!-- AFFIDABILITÀ -->
+    <section id="tab-affidabilita" class="scheda">
+      <div class="card">
+        <h3>Il gemello prevede bene? Test sulle rilevazioni passate</h3>
+        <p class="nota">Per ogni istante passato (ogni N ore) il gemello fa la previsione usando solo lo stato di quel momento; si confronta con quanto successo davvero e con due previsioni banali: <b>persistenza</b> ("resta tutto com'è") e <b>media oraria</b> (profilo medio del passato, ancorato al livello attuale).</p>
+        <div class="form-riga solo-locale">
+          <label>Giorni <input type="number" id="p-bt-giorni" value="30" min="3" max="120"></label>
+          <label>Ogni <input type="number" id="p-bt-ogni" value="3" min="1" max="24"> ore</label>
+          <button class="btn" id="btn-backtest">Esegui test</button>
+        </div>
+        <div class="progresso" id="prog-backtest"></div>
+        <div id="ris-backtest"></div>
+      </div>
+      <div class="card">
+        <h3>Il modello riproduce gli anni passati?</h3>
+        <p class="nota">Modello tarato sul 2025; per ogni anno gli si danno <b>solo</b> gli accessi per codice di quell'anno. Se le permanenze simulate non tornano, tra un anno e l'altro non è cambiato solo il carico (letti, personale, organizzazione): un limite da tenere presente nelle proiezioni.</p>
+        <p class="nota">Risultato con lo scenario di riferimento: la permanenza complessiva di ogni anno 2020-2025 è riprodotta entro circa un'ora; il boarding no (nel 2022 era molto più lungo di quanto il solo carico spieghi: i letti disponibili sono cambiati nel tempo). Le proiezioni sui letti vanno lette come direzione, non come numeri esatti.</p>
+        <button class="btn" id="btn-storica">Esegui</button>
+        <div class="progresso" id="prog-storica"></div>
+        <div id="ris-storica"></div>
+      </div>
+      <div class="card solo-locale">
+        <h3>Calibrazione</h3>
+        <p class="nota">Ritara il modello (tempo medico, processo per codice, pazienza, letti) sui dati ASL dell'anno scelto e sulle presenze misurate fino a oggi. Circa 4 minuti.</p>
+        <div class="form-riga">
+          <label>Anno ASL <select id="p-cal-anno"></select></label>
+          <label>Turni <select id="p-cal-turni"><option>A</option><option>B</option></select></label>
+          <label class="check"><input type="checkbox" id="p-cal-rivprec"> rivalutazione con precedenza</label>
+          <button class="btn" id="btn-calibra">Calibra</button>
+          <button class="btn-sec" id="btn-ricarica" title="Rilegge data/presenze.csv (dopo un git pull)">Ricarica dati</button>
+        </div>
+        <div class="progresso" id="prog-calibra"></div>
+        <div id="ris-calibra"></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="tooltip" id="tooltip" role="status" aria-live="polite"></div>
+<script src="grafici.js"></script>
+<script src="statico.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
