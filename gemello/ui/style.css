@@ -165,3 +165,9 @@ thead th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
 .piede { max-width: 1400px; padding: 0 24px 40px; }
 a { color: inherit; }
 main a, .parametri a { color: var(--rosso); }
+
+/* schede Istruzioni e Metodo: testo lungo con lo stile delle pagine del sito */
+.schede .scheda-doc { color: var(--text-secondary); }
+.doc-contenuto.card { padding: 6px 30px 26px; max-width: 980px; }
+.doc-contenuto td, .doc-contenuto th { font-family: var(--sans); font-size: 14px; text-align: left; }
+.doc-contenuto h1:first-child { margin-top: 18px; }

@@ -38,7 +38,7 @@ import gemello as G  # noqa: E402
 import ottimizza as O  # noqa: E402
 import simulazione as S  # noqa: E402
 import storico as ST  # noqa: E402
-from pagine import pagina_markdown  # noqa: E402
+from pagine import frammento_markdown, pagina_markdown  # noqa: E402
 
 OUT = QUI / "output"
 LIVE_FILE = OUT / "live_storico.json"
@@ -440,16 +440,20 @@ class Handler(SimpleHTTPRequestHandler):
             if self.path == "/api/storico":
                 return self._send(dict(serie=ST.serie(), crescita=ST.crescita_per_codice(),
                                        crescita_totale=ST.crescita_totale()))
-            if self.path in ("/guida", "/metodo", "/guida.html", "/metodo.html"):
-                nome = "GUIDA.md" if "guida" in self.path else "METODO.md"
-                html = pagina_markdown((QUI / nome).read_text(encoding="utf-8"), nome,
-                                       attivo="guida" if "guida" in self.path else "metodo")
-                body = html.encode()
+            if self.path in ("/istruzioni.frag.html", "/metodo.frag.html"):
+                nome = "GUIDA.md" if "istruzioni" in self.path else "METODO.md"
+                body = frammento_markdown((QUI / nome).read_text(encoding="utf-8")).encode()
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.send_header("Content-Length", str(len(body)))
+                self.send_header("Cache-Control", "no-store")
                 self.end_headers()
                 self.wfile.write(body)
+                return
+            if self.path in ("/guida", "/metodo", "/guida.html", "/metodo.html"):
+                self.send_response(302)
+                self.send_header("Location", "/#" + ("istruzioni" if "guida" in self.path else "metodo"))
+                self.end_headers()
                 return
             if self.path.startswith("/api/job/"):
                 j = JOBS.get(self.path.rsplit("/", 1)[1])

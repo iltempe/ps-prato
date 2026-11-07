@@ -1,7 +1,20 @@
 """Markdown essenziale -> pagina HTML (Guida e Metodo, in locale e sul sito)."""
 from __future__ import annotations
 
+def frammento_markdown(md: str, link_schede: str = "") -> str:
+    """Markdown -> HTML del solo contenuto (per le schede Istruzioni e Metodo del simulatore).
+    I link interni /guida e /metodo diventano link alle schede (#istruzioni, #metodo),
+    preceduti da `link_schede` (es. "../../gemello/ui/" quando il frammento sta in un'altra pagina)."""
+    return _converti(md, link_schede)
+
+
 def pagina_markdown(md: str, titolo: str, radice: str = "../../", attivo: str | None = None) -> str:
+    """Pagina completa con testata, menu e pie' di pagina del sito (usata per i report)."""
+    out = [_converti(md, radice + "gemello/ui/")]
+    return _pagina(out, titolo, radice, attivo)
+
+
+def _converti(md: str, link_schede: str) -> str:
     """Markdown essenziale -> HTML (titoli, paragrafi, elenchi, tabelle, grassetto, codice, link)."""
     import html as H
     import re
@@ -11,7 +24,8 @@ def pagina_markdown(md: str, titolo: str, radice: str = "../../", attivo: str | 
         t = re.sub(r"`([^`]+)`", r"<code>\1</code>", t)
         t = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", t)
         t = re.sub(r"(?<![*\w])\*([^*]+)\*(?!\w)", r"<i>\1</i>", t)
-        t = re.sub(r"\[([^\]]+)\]\(/(guida|metodo)\)", r'<a href="\2.html">\1</a>', t)
+        t = re.sub(r"\[([^\]]+)\]\(/guida\)", lambda m: f'<a href="{link_schede}#istruzioni" data-goto="istruzioni">{m.group(1)}</a>', t)
+        t = re.sub(r"\[([^\]]+)\]\(/metodo\)", lambda m: f'<a href="{link_schede}#metodo" data-goto="metodo">{m.group(1)}</a>', t)
         t = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', t)
         return t
 
@@ -68,6 +82,10 @@ def pagina_markdown(md: str, titolo: str, radice: str = "../../", attivo: str | 
                 par.append(righe[i])
             out.append("<p>" + inline(" ".join(par)) + "</p>")
         i += 1
+    return "".join(out)
+
+
+def _pagina(out, titolo, radice, attivo):
     r = radice
     cur = lambda k: ' aria-current="page"' if k == attivo else ""  # noqa: E731
     return f"""<!DOCTYPE html><html lang="it"><head><meta charset="utf-8"><title>{titolo}</title>
@@ -81,11 +99,9 @@ def pagina_markdown(md: str, titolo: str, radice: str = "../../", attivo: str | 
 <nav class="sito-nav" aria-label="Sezioni del sito">
 <a href="{r}">Dashboard</a>
 <a class="evid" href="{r}gemello/ui/"{cur("simulatore")}>🔬 Simulatore</a>
-<a href="{r}gemello/ui/guida.html"{cur("guida")}>Istruzioni</a>
-<a href="{r}gemello/ui/metodo.html"{cur("metodo")}>Metodo</a>
 <a href="https://github.com/iltempe/ps-prato/tree/main/data/ufficiali" target="_blank" rel="noopener">Dati ufficiali ASL</a>
 </nav>
-{"".join(out)}
+<div class="doc-contenuto">{"".join(out)}</div>
 <p class="credits"><a href="https://github.com/iltempe" target="_blank" rel="noopener">Matteo Tempestini · @iltempe</a>
 <a href="https://github.com/iltempe/ps-prato/tree/main/gemello" target="_blank" rel="noopener">Codice del modello</a>
 <a href="{r}privacy.html">Privacy</a></p>

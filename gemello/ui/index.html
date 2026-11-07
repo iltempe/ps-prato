@@ -31,8 +31,6 @@
   <nav class="sito-nav" aria-label="Sezioni del sito">
     <a href="../../" data-sito>Dashboard</a>
     <a class="evid" href="./" aria-current="page">🔬 Simulatore</a>
-    <a href="guida.html">Istruzioni</a>
-    <a href="metodo.html">Metodo</a>
     <a href="https://github.com/iltempe/ps-prato/tree/main/data/ufficiali" target="_blank" rel="noopener">Dati ufficiali ASL</a>
   </nav>
   <p class="sotto">Una copia simulata del Nuovo Ospedale S. Stefano, tarata sui dati ufficiali ASL (accesso civico prot. 158918/2026) e sulle presenze campionate ogni 15 minuti. Muovi i parametri a sinistra e guarda cosa cambierebbe.</p>
@@ -106,6 +104,8 @@
       <button role="tab" data-tab="investire">Su cosa investire</button>
       <button role="tab" data-tab="storico">Storico ASL</button>
       <button role="tab" data-tab="affidabilita">Affidabilità</button>
+      <button role="tab" data-tab="istruzioni" class="scheda-doc">Istruzioni</button>
+      <button role="tab" data-tab="metodo" class="scheda-doc">Metodo</button>
     </nav>
 
     <!-- ADESSO -->
@@ -248,13 +248,16 @@
         <div id="ris-calibra"></div>
       </div>
     </section>
+    <!-- ISTRUZIONI e METODO (testi in GUIDA.md e METODO.md) -->
+    <section id="tab-istruzioni" class="scheda"><div class="card doc-contenuto" id="doc-istruzioni"><p class="nota">caricamento…</p></div></section>
+    <section id="tab-metodo" class="scheda"><div class="card doc-contenuto" id="doc-metodo"><p class="nota">caricamento…</p></div></section>
   </main>
 </div>
 <footer class="piede">
   <p class="credits">
     <a href="https://github.com/iltempe" target="_blank" rel="noopener">Matteo Tempestini · @iltempe</a>
     <a href="https://github.com/iltempe/ps-prato/tree/main/gemello" target="_blank" rel="noopener">Codice del modello</a>
-    <a href="metodo.html">Metodo e limiti</a>
+    <a href="#metodo" data-goto="metodo">Metodo e limiti</a>
     <a href="../../privacy.html" data-sito>Privacy</a>
   </p>
 </footer>

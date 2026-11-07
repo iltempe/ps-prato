@@ -17,6 +17,10 @@
     --azzurro:#4f8bf5; --shadow:0 1px 2px rgba(0,0,0,.3); }
 }
 
+/* ---------- base: ogni pagina ha sfondo e testo del tema (chiaro o scuro) ---------- */
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+
 /* ---------- testata comune ---------- */
 .sito-testata{display:flex;align-items:center;justify-content:space-between;gap:10px 22px;flex-wrap:wrap;margin:0 0 6px}
 .brand{display:flex;align-items:center;gap:14px;margin:0;text-decoration:none;color:inherit}
@@ -40,32 +44,32 @@
 .credits a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:1px}
 .credits a:hover{color:var(--ink);border-color:var(--rosso)}
 
-/* ---------- pagine di testo (istruzioni, metodo, report) ---------- */
-.doc{font:15px/1.65 var(--sans)}
+/* ---------- testi lunghi: istruzioni e metodo (schede del simulatore), report ---------- */
+.doc,.doc-contenuto{font:15px/1.65 var(--sans);color:var(--ink)}
 .doc .wrap{max-width:860px;margin:0 auto;padding:26px 18px 64px}
-.doc h1{font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.01em;font-size:32px;line-height:1.05;margin:22px 0 10px}
-.doc h2{font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:22px;margin:34px 0 8px;
+:is(.doc,.doc-contenuto) h1{font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.01em;font-size:32px;line-height:1.05;margin:22px 0 10px}
+:is(.doc,.doc-contenuto) h2{font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:22px;margin:34px 0 8px;
   padding-top:14px;border-top:1px solid var(--line)}
-.doc h3{font-weight:600;font-size:16px;margin:22px 0 6px}
-.doc p,.doc li{max-width:75ch}
-.doc a{color:var(--rosso)}
+:is(.doc,.doc-contenuto) h3{font-weight:600;font-size:16px;margin:22px 0 6px}
+:is(.doc,.doc-contenuto) p,:is(.doc,.doc-contenuto) li{max-width:75ch}
+:is(.doc,.doc-contenuto) a{color:var(--rosso)}
 .doc .brand{color:var(--ink)}
 .doc .sito-nav a{color:var(--muted)}
 .doc .sito-nav a.evid{color:var(--rosso)}
 .doc .sito-nav a[aria-current="page"]{color:var(--card)}
 .doc .sito-nav a.evid[aria-current="page"]{color:#fff}
 .doc .credits a{color:inherit}
-.doc hr{display:none}
-.doc blockquote{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--rosso);border-radius:12px;
+:is(.doc,.doc-contenuto) hr{display:none}
+:is(.doc,.doc-contenuto) blockquote{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--rosso);border-radius:12px;
   margin:16px 0;padding:12px 16px;color:var(--ink);box-shadow:var(--shadow)}
-.doc pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow-x:auto;font:13px/1.5 var(--mono)}
-.doc code{font-family:var(--mono);font-size:.9em;background:rgba(127,127,127,.13);padding:1px 5px;border-radius:5px}
-.doc pre code{background:none;padding:0}
-.doc table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+:is(.doc,.doc-contenuto) pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow-x:auto;font:13px/1.5 var(--mono)}
+:is(.doc,.doc-contenuto) code{font-family:var(--mono);font-size:.9em;background:rgba(127,127,127,.13);padding:1px 5px;border-radius:5px}
+:is(.doc,.doc-contenuto) pre code{background:none;padding:0}
+:is(.doc,.doc-contenuto) table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
   overflow:hidden;margin:12px 0;box-shadow:var(--shadow)}
-.doc th,.doc td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--hair)}
-.doc thead th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;background:var(--bg)}
-.doc tr:last-child td{border-bottom:0}
+:is(.doc,.doc-contenuto) th,:is(.doc,.doc-contenuto) td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--hair)}
+:is(.doc,.doc-contenuto) thead th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;background:var(--bg)}
+:is(.doc,.doc-contenuto) tr:last-child td{border-bottom:0}
 
 /* ---------- pulsanti ---------- */
 .btn,.btn-sec{appearance:none;font:500 13px/1 var(--sans);border-radius:10px;padding:9px 14px;cursor:pointer;

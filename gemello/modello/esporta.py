@@ -31,12 +31,18 @@ import gemello as G  # noqa: E402
 import ottimizza as O  # noqa: E402
 import simulazione as S  # noqa: E402
 import storico as ST  # noqa: E402
-from pagine import pagina_markdown  # noqa: E402
+from pagine import frammento_markdown, pagina_markdown  # noqa: E402
 
 GEM = D.GEMELLO
 UI = GEM / "ui"
 DATI = UI / "dati"
 OUT = GEM / "output"
+
+
+RINVIO = """<!DOCTYPE html><html lang="it"><head><meta charset="utf-8"><title>{t} · Simulatore PS Prato</title>
+<meta http-equiv="refresh" content="0; url=./#{h}"><link rel="canonical" href="https://pspratolive.it/gemello/ui/#{h}">
+</head><body><p><a href="./#{h}">{t}: apri la scheda nel simulatore</a></p></body></html>
+"""
 
 
 def scrivi(nome, obj):
@@ -94,9 +100,11 @@ def main(con_affidabilita=True):
                                 crescita_totale=ST.crescita_totale()))
 
     # pagine Istruzioni e Metodo
-    for md, html, tit, att in (("GUIDA.md", "guida.html", "Istruzioni · Simulatore PS Prato", "guida"),
-                               ("METODO.md", "metodo.html", "Metodo · Simulatore PS Prato", "metodo")):
-        (UI / html).write_text(pagina_markdown((GEM / md).read_text(encoding="utf-8"), tit, attivo=att), encoding="utf-8")
+    # Istruzioni e Metodo: contenuto delle schede del simulatore (+ vecchi indirizzi che rimandano lì)
+    for md, frag, vecchio, tit, scheda in (("GUIDA.md", "istruzioni.frag.html", "guida.html", "Istruzioni", "istruzioni"),
+                                            ("METODO.md", "metodo.frag.html", "metodo.html", "Metodo", "metodo")):
+        (UI / frag).write_text(frammento_markdown((GEM / md).read_text(encoding="utf-8")), encoding="utf-8")
+        (UI / vecchio).write_text(RINVIO.format(t=tit, h=scheda), encoding="utf-8")
 
     # libreria degli analoghi (scenario di riferimento) per la previsione pubblicata dalla Action
     g = cfg["gemello"]["analoghi"]

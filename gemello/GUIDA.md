@@ -86,8 +86,8 @@ legge soltanto la pagina pubblica di pspratolive.it.
 letti, ecc.). Ogni volta che ne cambi uno, il gemello ricalcola tutto da solo in pochi secondi.
 Il pulsante **Ripristina** riporta tutto ai valori di partenza, cioè alla situazione reale.
 
-**Al centro** ci sono cinque schede: *Adesso*, *Regime annuo*, *Su cosa investire*,
-*Storico ASL*, *Affidabilità*.
+**Al centro** ci sono le schede: *Adesso*, *Regime annuo*, *Su cosa investire*,
+*Storico ASL*, *Affidabilità*, e poi *Istruzioni* (questa guida) e *Metodo*.
 
 **In alto a destra** ci sono due pulsanti per salvare la simulazione:
 
@@ -98,7 +98,7 @@ Il pulsante **Ripristina** riporta tutto ai valori di partenza, cioè alla situa
   regime annuo, base e con i parametri, per codice), utile per rielaborarli o per allegarli a
   un articolo.
 
-Le pagine **Istruzioni** (questa guida) e **Metodo** si aprono dai link in alto.
+**Istruzioni** (questa guida) e **Metodo** sono due schede del simulatore, accanto alle altre.
 
 ### Come leggere i grafici
 

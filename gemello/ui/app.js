@@ -129,9 +129,27 @@ function vaiA(tab) {
   if (tab === "regime" && REGIME_STALE) aggiornaRegime();
   if (tab === "storico" && !STORICO) caricaStorico();
   if (tab === "adesso" && ULTIMA_PREV) disegnaPrevisione(ULTIMA_PREV);
+  if (tab === "istruzioni" || tab === "metodo") caricaTesto(tab);
+  history.replaceState(null, "", "#" + tab);
 }
+const TESTI = {};
+async function caricaTesto(tab) {
+  if (TESTI[tab]) return;
+  const box = $("#doc-" + tab);
+  try {
+    const r = await fetch(tab + ".frag.html", { cache: "no-store" });
+    if (!r.ok) throw new Error(r.statusText);
+    box.innerHTML = await r.text();
+    TESTI[tab] = true;
+  } catch (e) { box.innerHTML = `<p class="errore">Testo non disponibile (${e.message}).</p>`; }
+}
+// link "data-goto" ovunque nella pagina, anche dentro i testi caricati
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-goto]");
+  if (!a) return;
+  e.preventDefault(); vaiA(a.dataset.goto); window.scrollTo({ top: 0, behavior: "smooth" });
+});
 document.querySelectorAll(".schede button").forEach(b => b.addEventListener("click", () => vaiA(b.dataset.tab)));
-document.querySelectorAll("[data-goto]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); vaiA(a.dataset.goto); }));
 
 /* ------------------------------------------------------------------ live */
 async function aggiornaStato() {
@@ -580,7 +598,7 @@ $("#btn-pdf").addEventListener("click", async e => {
       ${gPrev ? `<h2>Previsione delle prossime ore (da ${new Date(ULTIMA_PREV.inizio).toLocaleString("it-IT")})</h2><div class="chart">${gPrev}</div>` : ""}
       <p class="avv">Risultati di un modello di simulazione tarato sui dati ufficiali ASL e sulle presenze misurate ogni 15 minuti: non sono misure.
       Costi ed effetti di alcune leve sono stime indicative. Differenze sotto 1-2 punti percentuali sono rumore statistico.
-      Metodo: ${new URL("metodo.html", location.href)}</p></body></html>`;
+      Metodo: ${new URL("#metodo", location.href.split("#")[0])}</p></body></html>`;
     const w = window.open("", "_blank");
     if (!w) { alert("Il browser ha bloccato la finestra: consenti i pop-up per questo sito."); return; }
     w.document.write(html); w.document.close();
@@ -617,6 +635,6 @@ $("#btn-pdf").addEventListener("click", async e => {
   window.addEventListener("resize", () => { if (ULTIMA_PREV) disegnaPrevisione(ULTIMA_PREV); });
   if (STATICO) mostraPubblicati();
   const h = location.hash.slice(1);
-  if (["regime", "investire", "storico", "affidabilita"].includes(h)) vaiA(h);
-  document.querySelectorAll(".schede button").forEach(b => b.addEventListener("click", () => history.replaceState(null, "", "#" + b.dataset.tab)));
+  if (["regime", "investire", "storico", "affidabilita", "istruzioni", "metodo"].includes(h)) vaiA(h);
+  window.addEventListener("hashchange", () => { const t = location.hash.slice(1); if (document.getElementById("tab-" + t)) vaiA(t); });
 })();
