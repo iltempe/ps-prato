@@ -262325,3 +262325,9 @@ ts_scrape,regione,provincia,ospedale,codice,in_attesa,in_trattamento,lat,lng
 2026-11-10T11:26:57+01:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,verde,8,9,43.3435671,11.3296733
 2026-11-10T11:26:57+01:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,bianco,5,3,43.3435671,11.3296733
 2026-11-10T11:26:57+01:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,totali,15,38,43.3435671,11.3296733
+2026-11-10T11:43:52+01:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,rosso,0,3,43.3435671,11.3296733
+2026-11-10T11:43:52+01:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,arancione,0,6,43.3435671,11.3296733
+2026-11-10T11:43:52+01:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,azzurro,2,19,43.3435671,11.3296733
+2026-11-10T11:43:52+01:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,verde,5,13,43.3435671,11.3296733
+2026-11-10T11:43:52+01:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,bianco,3,3,43.3435671,11.3296733
+2026-11-10T11:43:52+01:00,toscana,siena,Siena - Policlinico Santa Maria alle Scotte,totali,10,44,43.3435671,11.3296733
